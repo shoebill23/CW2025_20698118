@@ -24,8 +24,10 @@ public class GameController implements InputEventListener {
             if (clearRow.getLinesRemoved() > 0) {
                 board.getScore().add(clearRow.getScoreBonus());
             }
-            if (board.createNewBrick()) {
+            if (board.isGameOver()) {
                 viewGuiController.gameOver();
+            } else {
+                board.createNewBrick();
             }
 
             viewGuiController.refreshGameBackground(board.getBoardMatrix());

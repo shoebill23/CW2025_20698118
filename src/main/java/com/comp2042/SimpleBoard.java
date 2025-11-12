@@ -85,8 +85,24 @@ public class SimpleBoard implements Board {
     public boolean createNewBrick() {
         Brick currentBrick = brickGenerator.getBrick();
         brickRotator.setBrick(currentBrick);
-        currentOffset = new Point(4, 10);
+        currentOffset = new Point(4, 0);
         return MatrixOperations.intersect(currentGameMatrix, brickRotator.getCurrentShape(), (int) currentOffset.getX(), (int) currentOffset.getY());
+    }
+    
+    @Override
+    public boolean isGameOver() {
+        // Check if row 5 (20-block height line) has any blocks
+        // Row 5 is 20 blocks from the bottom (row 24): 24 - 5 + 1 = 20
+        int gameOverRow = 5;
+        if (gameOverRow >= currentGameMatrix.length) {
+            return false;
+        }
+        for (int x = 0; x < currentGameMatrix[gameOverRow].length; x++) {
+            if (currentGameMatrix[gameOverRow][x] != 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override

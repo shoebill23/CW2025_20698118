@@ -5,14 +5,26 @@
 <?import javafx.scene.Group?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Text?>
+<?import javafx.scene.shape.Rectangle?>
 <?import java.net.URL?>
 <Pane fx:controller="com.comp2042.GuiController"
       xmlns:fx="http://javafx.com/fxml">
-    <GridPane fx:id="brickPanel" vgap="1" hgap="1"/>
-    <BorderPane styleClass="gameBoard" fx:id="gameBoard">
+    <BorderPane fx:id="gameBoard">
         <center>
-            <GridPane fx:id="gamePanel" hgap="1" vgap="1" layoutY="30" layoutX="40"/>
+            <Pane styleClass="gameBoard" prefWidth="250" prefHeight="520" layoutX="20" layoutY="20">
+                <clip>
+                    <Rectangle width="250" height="520"/>
+                </clip>
+                <GridPane fx:id="gamePanel" hgap="1" vgap="1" layoutY="25" layoutX="20"/>
+                <GridPane fx:id="brickPanel" vgap="1" hgap="1"/>
+            </Pane>
         </center>
+                <right>
+            <VBox alignment="TOP_CENTER" spacing="12" style="-fx-padding: 30 20 0 20;" prefWidth="140">
+                <Label text="SCORE" styleClass="scoreLabel"/>
+                <Label fx:id="scoreLabel" text="0" styleClass="scoreValue"/>
+            </VBox>
+        </right>
     </BorderPane>
 
     <Group fx:id="groupNotification" layoutX="14" layoutY="203">
