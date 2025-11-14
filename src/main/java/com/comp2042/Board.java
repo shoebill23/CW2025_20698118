@@ -25,4 +25,8 @@ public interface Board {
     void newGame();
     
     boolean isGameOver();
+    
+    ViewData holdBrick();
+    
+    int[][] getHoldBrickData();
 }

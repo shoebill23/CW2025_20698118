@@ -15,6 +15,8 @@ public class SimpleBoard implements Board {
     private int[][] currentGameMatrix;
     private Point currentOffset;
     private final Score score;
+    private Brick holdBrick;
+    private boolean canHold = true; // Can only hold once per brick placement
 
     public SimpleBoard(int width, int height) {
         this.width = width;
@@ -138,6 +140,47 @@ public class SimpleBoard implements Board {
     public void newGame() {
         currentGameMatrix = new int[width][height];
         score.reset();
+        holdBrick = null;
+        canHold = true;
         createNewBrick();
+    }
+    
+    @Override
+    public ViewData holdBrick() {
+        if (!canHold) {
+            return getViewData(); // Can't hold if already held this turn
+        }
+        
+        Brick currentBrick = brickRotator.getBrick();
+        
+        if (holdBrick == null) {
+            // First time holding - store current brick and get next brick
+            holdBrick = currentBrick;
+            Brick nextBrick = brickGenerator.getBrick();
+            brickRotator.setBrick(nextBrick);
+            currentOffset = new Point(4, 0);
+            canHold = false;
+        } else {
+            // Swap current brick with hold brick
+            Brick temp = holdBrick;
+            holdBrick = currentBrick;
+            brickRotator.setBrick(temp);
+            currentOffset = new Point(4, 0);
+            canHold = false;
+        }
+        
+        return getViewData();
+    }
+    
+    @Override
+    public int[][] getHoldBrickData() {
+        if (holdBrick == null) {
+            return null;
+        }
+        return holdBrick.getShapeMatrix().get(0); // Return first rotation
+    }
+    
+    public void resetCanHold() {
+        canHold = true;
     }
 }
