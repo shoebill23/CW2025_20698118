@@ -10,6 +10,12 @@
 <Pane fx:controller="com.comp2042.GuiController"
       xmlns:fx="http://javafx.com/fxml">
     <BorderPane fx:id="gameBoard">
+        <left>
+            <VBox alignment="TOP_CENTER" spacing="16" style="-fx-padding: 30 20 0 20;" prefWidth="160">
+                <Label text="Hold:" styleClass="scoreLabel"/>
+                <GridPane fx:id="holdBrickPanel" hgap="2" vgap="2" styleClass="nextBrick" style="-fx-padding: 10px;"/>
+            </VBox>
+        </left>
         <center>
             <Pane styleClass="gameBoard" prefWidth="250" prefHeight="520" layoutX="20" layoutY="20">
                 <clip>
@@ -19,10 +25,12 @@
                 <GridPane fx:id="brickPanel" vgap="1" hgap="1"/>
             </Pane>
         </center>
-                <right>
-            <VBox alignment="TOP_CENTER" spacing="12" style="-fx-padding: 30 20 0 20;" prefWidth="140">
+        <right>
+            <VBox alignment="TOP_CENTER" spacing="16" style="-fx-padding: 30 20 0 20;" prefWidth="160">
                 <Label text="SCORE" styleClass="scoreLabel"/>
                 <Label fx:id="scoreLabel" text="0" styleClass="scoreValue"/>
+                <Label text="Next Brick:" styleClass="scoreLabel"/>
+                <GridPane fx:id="nextBrickPanel" hgap="2" vgap="2" styleClass="nextBrick" style="-fx-padding: 10px;"/>
             </VBox>
         </right>
     </BorderPane>

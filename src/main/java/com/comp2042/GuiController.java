@@ -38,6 +38,12 @@ public class GuiController implements Initializable {
     private GridPane brickPanel;
 
     @FXML
+    private GridPane nextBrickPanel;
+
+    @FXML
+    private GridPane holdBrickPanel;
+
+    @FXML
     private GameOverPanel gameOverPanel;
 
     @FXML
@@ -48,6 +54,8 @@ public class GuiController implements Initializable {
     private InputEventListener eventListener;
 
     private Rectangle[][] rectangles;
+    private Rectangle[][] nextBrickRectangles;
+    private Rectangle[][] holdBrickRectangles;
 
     private Timeline timeLine;
 
@@ -78,6 +86,11 @@ public class GuiController implements Initializable {
                     }
                     if (keyEvent.getCode() == KeyCode.DOWN || keyEvent.getCode() == KeyCode.S) {
                         moveDown(new MoveEvent(EventType.DOWN, EventSource.USER));
+                        keyEvent.consume();
+                    }
+                    if (keyEvent.getCode() == KeyCode.C) {
+                        ViewData viewData = eventListener.onHoldEvent();
+                        refreshBrick(viewData);
                         keyEvent.consume();
                     }
                 }
@@ -117,6 +130,7 @@ public class GuiController implements Initializable {
         brickPanel.setLayoutX(gamePanel.getLayoutX() + brick.getxPosition() * brickPanel.getVgap() + brick.getxPosition() * BRICK_SIZE);
         brickPanel.setLayoutY(-42 + gamePanel.getLayoutY() + brick.getyPosition() * brickPanel.getHgap() + brick.getyPosition() * BRICK_SIZE);
 
+        updateNextBrick(brick.getNextBrickData());
 
         timeLine = new Timeline(new KeyFrame(
                 Duration.millis(400),
@@ -171,6 +185,7 @@ public class GuiController implements Initializable {
                 }
             }
         }
+        updateNextBrick(brick.getNextBrickData());
     }
 
     public void refreshGameBackground(int[][] board) {
@@ -226,5 +241,74 @@ public class GuiController implements Initializable {
 
     public void pauseGame(ActionEvent actionEvent) {
         gamePanel.requestFocus();
+    }
+
+    private void updateNextBrick(int[][] nextBrickData) {
+        if (nextBrickData == null || nextBrickPanel == null) {
+            return;
+        }
+
+        final int NEXT_BRICK_SIZE = 15; // Smaller size for preview
+
+        if (nextBrickRectangles == null
+                || nextBrickRectangles.length != nextBrickData.length
+                || nextBrickRectangles[0].length != nextBrickData[0].length) {
+            nextBrickPanel.getChildren().clear();
+            nextBrickRectangles = new Rectangle[nextBrickData.length][nextBrickData[0].length];
+            for (int i = 0; i < nextBrickData.length; i++) {
+                for (int j = 0; j < nextBrickData[i].length; j++) {
+                    Rectangle rectangle = new Rectangle(NEXT_BRICK_SIZE, NEXT_BRICK_SIZE);
+                    rectangle.setFill(Color.TRANSPARENT);
+                    setRectangleData(0, rectangle); // Initialize with transparent
+                    nextBrickRectangles[i][j] = rectangle;
+                    nextBrickPanel.add(rectangle, j, i);
+                }
+            }
+        }
+
+        for (int i = 0; i < nextBrickData.length; i++) {
+            for (int j = 0; j < nextBrickData[i].length; j++) {
+                setRectangleData(nextBrickData[i][j], nextBrickRectangles[i][j]);
+            }
+        }
+    }
+    
+    public void updateHoldBrick(int[][] holdBrickData) {
+        if (holdBrickPanel == null) {
+            return;
+        }
+
+        final int HOLD_BRICK_SIZE = 15; // Smaller size for preview
+
+        if (holdBrickData == null) {
+            // Clear the hold panel if no brick is held
+            if (holdBrickRectangles != null) {
+                holdBrickPanel.getChildren().clear();
+                holdBrickRectangles = null;
+            }
+            return;
+        }
+
+        if (holdBrickRectangles == null
+                || holdBrickRectangles.length != holdBrickData.length
+                || holdBrickRectangles[0].length != holdBrickData[0].length) {
+            holdBrickPanel.getChildren().clear();
+            holdBrickRectangles = new Rectangle[holdBrickData.length][holdBrickData[0].length];
+            for (int i = 0; i < holdBrickData.length; i++) {
+                for (int j = 0; j < holdBrickData[i].length; j++) {
+                    Rectangle rectangle = new Rectangle(HOLD_BRICK_SIZE, HOLD_BRICK_SIZE);
+                    rectangle.setFill(Color.TRANSPARENT);
+                    setRectangleData(0, rectangle); // Initialize with transparent
+                    holdBrickRectangles[i][j] = rectangle;
+                    holdBrickPanel.add(rectangle, j, i);
+                }
+            }
+        }
+
+        for (int i = 0; i < holdBrickData.length; i++) {
+            for (int j = 0; j < holdBrickData[i].length; j++) {
+                setRectangleData(holdBrickData[i][j], holdBrickRectangles[i][j]);
+            }
+        }
     }
 }
