@@ -47,6 +47,12 @@ public class GuiController implements Initializable {
     private GameOverPanel gameOverPanel;
 
     @FXML
+    private PausePanel pausePanel;
+
+    @FXML
+    private Group groupPause;
+
+    @FXML
     private Label scoreLabel;
 
     private Rectangle[][] displayMatrix;
@@ -93,13 +99,23 @@ public class GuiController implements Initializable {
                         refreshBrick(viewData);
                         keyEvent.consume();
                     }
+                    if (keyEvent.getCode() == KeyCode.SPACE) {
+                        hardDrop();
+                        keyEvent.consume();
+                    }
                 }
                 if (keyEvent.getCode() == KeyCode.N) {
                     newGame(null);
                 }
+                if (keyEvent.getCode() == KeyCode.ESCAPE) {
+                    togglePause();
+                    keyEvent.consume();
+                }
             }
         });
         gameOverPanel.setVisible(false);
+        pausePanel.setVisible(false);
+        groupPause.setVisible(false);
 
         final Reflection reflection = new Reflection();
         reflection.setFraction(0.8);
@@ -215,6 +231,19 @@ public class GuiController implements Initializable {
         gamePanel.requestFocus();
     }
 
+    private void hardDrop() {
+        if (isPause.getValue() == Boolean.FALSE) {
+            DownData downData = eventListener.onHardDropEvent();
+            if (downData.getClearRow() != null && downData.getClearRow().getLinesRemoved() > 0) {
+                NotificationPanel notificationPanel = new NotificationPanel("+" + downData.getClearRow().getScoreBonus());
+                groupNotification.getChildren().add(notificationPanel);
+                notificationPanel.showScore(groupNotification.getChildren());
+            }
+            refreshBrick(downData.getViewData());
+        }
+        gamePanel.requestFocus();
+    }
+
     public void setEventListener(InputEventListener eventListener) {
         this.eventListener = eventListener;
     }
@@ -232,6 +261,8 @@ public class GuiController implements Initializable {
     public void newGame(ActionEvent actionEvent) {
         timeLine.stop();
         gameOverPanel.setVisible(false);
+        pausePanel.setVisible(false);
+        groupPause.setVisible(false);
         eventListener.createNewGame();
         gamePanel.requestFocus();
         timeLine.play();
@@ -240,6 +271,27 @@ public class GuiController implements Initializable {
     }
 
     public void pauseGame(ActionEvent actionEvent) {
+        togglePause();
+    }
+
+    private void togglePause() {
+        if (isGameOver.getValue() == Boolean.TRUE) {
+            return; // Don't allow pausing when game is over
+        }
+        
+        if (isPause.getValue() == Boolean.FALSE) {
+            // Pause the game
+            timeLine.pause();
+            isPause.setValue(Boolean.TRUE);
+            pausePanel.setVisible(true);
+            groupPause.setVisible(true);
+        } else {
+            // Resume the game
+            timeLine.play();
+            isPause.setValue(Boolean.FALSE);
+            pausePanel.setVisible(false);
+            groupPause.setVisible(false);
+        }
         gamePanel.requestFocus();
     }
 

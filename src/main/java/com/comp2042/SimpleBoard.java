@@ -183,4 +183,26 @@ public class SimpleBoard implements Board {
     public void resetCanHold() {
         canHold = true;
     }
+    
+    @Override
+    public void hardDrop() {
+        int[][] currentMatrix = MatrixOperations.copy(currentGameMatrix);
+        int[][] currentShape = brickRotator.getCurrentShape();
+        int currentX = (int) currentOffset.getX();
+        int currentY = (int) currentOffset.getY();
+        
+        // Find the lowest valid Y position
+        Point p = new Point(currentOffset);
+        while (true) {
+            Point nextP = new Point(p);
+            nextP.translate(0, 1);
+            boolean conflict = MatrixOperations.intersect(currentMatrix, currentShape, (int) nextP.getX(), (int) nextP.getY());
+            if (conflict) {
+                break; // The next position is invalid, so the current 'p' is the lowest valid spot.
+            }
+            p = nextP; // The next position is valid, so we continue from there.
+        }
+        // Move brick to the lowest valid position
+        currentOffset = p;
+    }
 }

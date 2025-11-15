@@ -29,4 +29,6 @@ public interface Board {
     ViewData holdBrick();
     
     int[][] getHoldBrickData();
+    
+    void hardDrop();
 }
