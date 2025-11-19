@@ -1,5 +1,4 @@
 <?import com.comp2042.GameOverPanel?>
-<?import com.comp2042.PausePanel?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ToggleButton?>
@@ -13,7 +12,7 @@
     <BorderPane fx:id="gameBoard">
         <left>
             <VBox alignment="TOP_CENTER" spacing="16" style="-fx-padding: 30 20 0 20;" prefWidth="160">
-                <Label text="Hold:" styleClass="scoreLabel"/>
+                <Label fx:id="holdLabel" text="Hold:" styleClass="scoreLabel"/>
                 <GridPane fx:id="holdBrickPanel" hgap="2" vgap="2" styleClass="nextBrick" style="-fx-padding: 10px;"/>
             </VBox>
         </left>
@@ -28,9 +27,9 @@
         </center>
         <right>
             <VBox alignment="TOP_CENTER" spacing="16" style="-fx-padding: 30 20 0 20;" prefWidth="160">
-                <Label text="SCORE" styleClass="scoreLabel"/>
+                <Label fx:id="scoreTitleLabel" text="SCORE" styleClass="scoreLabel"/>
                 <Label fx:id="scoreLabel" text="0" styleClass="scoreValue"/>
-                <Label text="Next Brick:" styleClass="scoreLabel"/>
+                <Label fx:id="nextBrickLabel" text="Next Brick:" styleClass="scoreLabel"/>
                 <GridPane fx:id="nextBrickPanel" hgap="2" vgap="2" styleClass="nextBrick" style="-fx-padding: 10px;"/>
             </VBox>
         </right>
@@ -41,11 +40,7 @@
             <GameOverPanel fx:id="gameOverPanel"/>
         </VBox>
     </Group>
-    <Group fx:id="groupPause" layoutX="195" layoutY="203">
-        <VBox alignment="CENTER">
-            <PausePanel fx:id="pausePanel"/>
-        </VBox>
-    </Group>
+    <Group fx:id="groupPause" layoutX="183" layoutY="175"/>
     <stylesheets>
         <URL value="@window_style.css"/>
     </stylesheets>

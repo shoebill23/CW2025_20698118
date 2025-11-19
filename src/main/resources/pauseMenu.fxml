@@ -1,0 +1,17 @@
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.geometry.Insets?>
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.comp2042.PauseMenuController"
+      alignment="CENTER" spacing="20"
+      style="-fx-background-color: rgba(0, 0, 0, 0.7); -fx-border-color: white; -fx-border-width: 2;">
+
+    <padding>
+        <Insets top="20" right="40" bottom="20" left="40"/>
+    </padding>
+
+    <Label fx:id="pausedLabel" text="PAUSED" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+    <Button fx:id="restartButton" text="Restart" onAction="#onRestartClicked" prefWidth="120" prefHeight="40"/>
+    <Button fx:id="quitButton" text="Quit" onAction="#onQuitClicked" prefWidth="120" prefHeight="40"/>
+</VBox>

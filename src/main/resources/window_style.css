@@ -22,8 +22,6 @@
 }
 
 .nextBrickLabel {
-    font-family: "Let's go Digital";
-    -fx-font-family: "Let's go Digital";
     padding: 20px 0 0 0;
     -fx-padding: 20px 0 0 0;
     font-size: 16px;
@@ -46,9 +44,8 @@
     -fx-background-radius: 9, 8, 5, 4, 3;
     padding: 8;
     -fx-padding: 8;
-    /*-fx-font-family: "Helvetica";*/
-    font-family: "Let's go Digital";
-    -fx-font-family: "Let's go Digital";
+    font-family: "Janinos Juosta";
+    -fx-font-family: "Janinos Juosta";
     font-size: 22px;
     -fx-font-size: 22px;
     font-weight: bold;
@@ -83,27 +80,25 @@
 }
 
 .gameOverStyle {
-    font-family: "Let's go Digital";
-    -fx-font-family: "Let's go Digital";
+    font-family: "Janinos Juosta";
+    -fx-font-family: "Janinos Juosta";
     font-size: 48;
     -fx-font-size: 48;
     background-color: red;
     -fx-background-color: red;
 }
-
 .scoreClass{
-    font-family: "Let's go Digital";
-    -fx-font-family: "Let's go Digital";
+    font-family: "Janinos Juosta";
+    -fx-font-family: "Janinos Juosta";
     font-size: 38;
     -fx-font-size: 38;
     fill: yellow;
     -fx-fill: yellow;
-    -fx-text-fill: yellow;
 }
 
 .scoreLabel {
-    font-family: "Let's go Digital";
-    -fx-font-family: "Let's go Digital";
+    font-family: "Janinos Juosta";
+    -fx-font-family: "Janinos Juosta";
     font-size: 20px;
     -fx-font-size: 20px;
     -fx-text-fill: #FFD700;
@@ -112,8 +107,8 @@
 }
 
 .scoreValue {
-    font-family: "Let's go Digital";
-    -fx-font-family: "Let's go Digital";
+    font-family: "Janinos Juosta";
+    -fx-font-family: "Janinos Juosta";
     font-size: 24px;
     -fx-font-size: 24px;
     -fx-text-fill: #00FF00;

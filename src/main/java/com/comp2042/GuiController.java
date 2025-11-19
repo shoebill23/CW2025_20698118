@@ -18,7 +18,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
 import javafx.util.Duration;
 
 import java.net.URL;
@@ -47,13 +46,21 @@ public class GuiController implements Initializable {
     private GameOverPanel gameOverPanel;
 
     @FXML
-    private PausePanel pausePanel;
-
-    @FXML
     private Group groupPause;
+
+    private PauseMenuController pauseMenuController;
 
     @FXML
     private Label scoreLabel;
+
+    @FXML
+    private Label holdLabel;
+    
+    @FXML
+    private Label scoreTitleLabel;
+    
+    @FXML
+    private Label nextBrickLabel;
 
     private Rectangle[][] displayMatrix;
 
@@ -62,6 +69,10 @@ public class GuiController implements Initializable {
     private Rectangle[][] rectangles;
     private Rectangle[][] nextBrickRectangles;
     private Rectangle[][] holdBrickRectangles;
+    
+    // Fixed grid size for preview panels (all bricks are 4x4)
+    private static final int PREVIEW_GRID_SIZE = 4;
+    private static final int PREVIEW_BRICK_SIZE = 15;
 
     private Timeline timeLine;
 
@@ -71,7 +82,9 @@ public class GuiController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Font.loadFont(getClass().getClassLoader().getResource("digital.ttf").toExternalForm(), 38);
+        // Load font using FontLoader
+        FontLoader.loadFont();
+
         gamePanel.setFocusTraversable(true);
         gamePanel.requestFocus();
         gamePanel.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -107,6 +120,7 @@ public class GuiController implements Initializable {
                 if (keyEvent.getCode() == KeyCode.N) {
                     newGame(null);
                 }
+                // ESC key works both when paused and unpaused
                 if (keyEvent.getCode() == KeyCode.ESCAPE) {
                     togglePause();
                     keyEvent.consume();
@@ -114,8 +128,11 @@ public class GuiController implements Initializable {
             }
         });
         gameOverPanel.setVisible(false);
-        pausePanel.setVisible(false);
         groupPause.setVisible(false);
+        
+        // Load pause menu manually to avoid fx:include issues
+        loadPauseMenu();
+        
 
         final Reflection reflection = new Reflection();
         reflection.setFraction(0.8);
@@ -147,6 +164,9 @@ public class GuiController implements Initializable {
         brickPanel.setLayoutY(-42 + gamePanel.getLayoutY() + brick.getyPosition() * brickPanel.getHgap() + brick.getyPosition() * BRICK_SIZE);
 
         updateNextBrick(brick.getNextBrickData());
+        
+        // Initialize hold brick panel grid even if no brick is held
+        initializeHoldBrickGrid();
 
         timeLine = new Timeline(new KeyFrame(
                 Duration.millis(400),
@@ -243,7 +263,7 @@ public class GuiController implements Initializable {
         }
         gamePanel.requestFocus();
     }
-
+    
     public void setEventListener(InputEventListener eventListener) {
         this.eventListener = eventListener;
     }
@@ -261,7 +281,6 @@ public class GuiController implements Initializable {
     public void newGame(ActionEvent actionEvent) {
         timeLine.stop();
         gameOverPanel.setVisible(false);
-        pausePanel.setVisible(false);
         groupPause.setVisible(false);
         eventListener.createNewGame();
         gamePanel.requestFocus();
@@ -274,6 +293,31 @@ public class GuiController implements Initializable {
         togglePause();
     }
 
+    private void loadPauseMenu() {
+        try {
+            URL pauseMenuLocation = getClass().getClassLoader().getResource("pauseMenu.fxml");
+            if (pauseMenuLocation == null) {
+                System.err.println("Error: Could not find pauseMenu.fxml resource");
+                return;
+            }
+            
+            javafx.fxml.FXMLLoader pauseMenuLoader = new javafx.fxml.FXMLLoader(pauseMenuLocation);
+            javafx.scene.Parent pauseMenuRoot = pauseMenuLoader.load();
+            pauseMenuController = pauseMenuLoader.getController();
+            
+            if (pauseMenuController != null) {
+                pauseMenuController.setGuiController(this);
+                groupPause.getChildren().add(pauseMenuRoot);
+                System.out.println("Pause menu loaded successfully");
+            } else {
+                System.err.println("Warning: Pause menu controller is null after loading");
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading pause menu: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
     private void togglePause() {
         if (isGameOver.getValue() == Boolean.TRUE) {
             return; // Don't allow pausing when game is over
@@ -283,13 +327,11 @@ public class GuiController implements Initializable {
             // Pause the game
             timeLine.pause();
             isPause.setValue(Boolean.TRUE);
-            pausePanel.setVisible(true);
             groupPause.setVisible(true);
         } else {
             // Resume the game
             timeLine.play();
             isPause.setValue(Boolean.FALSE);
-            pausePanel.setVisible(false);
             groupPause.setVisible(false);
         }
         gamePanel.requestFocus();
@@ -300,16 +342,13 @@ public class GuiController implements Initializable {
             return;
         }
 
-        final int NEXT_BRICK_SIZE = 15; // Smaller size for preview
-
-        if (nextBrickRectangles == null
-                || nextBrickRectangles.length != nextBrickData.length
-                || nextBrickRectangles[0].length != nextBrickData[0].length) {
+        // Initialize fixed 4x4 grid if not already created
+        if (nextBrickRectangles == null) {
             nextBrickPanel.getChildren().clear();
-            nextBrickRectangles = new Rectangle[nextBrickData.length][nextBrickData[0].length];
-            for (int i = 0; i < nextBrickData.length; i++) {
-                for (int j = 0; j < nextBrickData[i].length; j++) {
-                    Rectangle rectangle = new Rectangle(NEXT_BRICK_SIZE, NEXT_BRICK_SIZE);
+            nextBrickRectangles = new Rectangle[PREVIEW_GRID_SIZE][PREVIEW_GRID_SIZE];
+            for (int i = 0; i < PREVIEW_GRID_SIZE; i++) {
+                for (int j = 0; j < PREVIEW_GRID_SIZE; j++) {
+                    Rectangle rectangle = new Rectangle(PREVIEW_BRICK_SIZE, PREVIEW_BRICK_SIZE);
                     rectangle.setFill(Color.TRANSPARENT);
                     setRectangleData(0, rectangle); // Initialize with transparent
                     nextBrickRectangles[i][j] = rectangle;
@@ -318,9 +357,47 @@ public class GuiController implements Initializable {
             }
         }
 
+        // Calculate offset to center the brick within the 4x4 grid
+        int[] offset = calculateCenteringOffset(nextBrickData, PREVIEW_GRID_SIZE);
+
+        // Clear all rectangles first
+        for (int i = 0; i < PREVIEW_GRID_SIZE; i++) {
+            for (int j = 0; j < PREVIEW_GRID_SIZE; j++) {
+                setRectangleData(0, nextBrickRectangles[i][j]);
+            }
+        }
+
+        // Place the brick centered within the grid
         for (int i = 0; i < nextBrickData.length; i++) {
             for (int j = 0; j < nextBrickData[i].length; j++) {
-                setRectangleData(nextBrickData[i][j], nextBrickRectangles[i][j]);
+                int targetRow = i + offset[0];
+                int targetCol = j + offset[1];
+                if (targetRow >= 0 && targetRow < PREVIEW_GRID_SIZE && 
+                    targetCol >= 0 && targetCol < PREVIEW_GRID_SIZE) {
+                    setRectangleData(nextBrickData[i][j], nextBrickRectangles[targetRow][targetCol]);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Initializes the hold brick panel grid structure.
+     * This ensures the panel maintains its size even when no brick is held.
+     */
+    private void initializeHoldBrickGrid() {
+        if (holdBrickPanel == null || holdBrickRectangles != null) {
+            return; // Already initialized or panel doesn't exist
+        }
+        
+        holdBrickPanel.getChildren().clear();
+        holdBrickRectangles = new Rectangle[PREVIEW_GRID_SIZE][PREVIEW_GRID_SIZE];
+        for (int i = 0; i < PREVIEW_GRID_SIZE; i++) {
+            for (int j = 0; j < PREVIEW_GRID_SIZE; j++) {
+                Rectangle rectangle = new Rectangle(PREVIEW_BRICK_SIZE, PREVIEW_BRICK_SIZE);
+                rectangle.setFill(Color.TRANSPARENT);
+                setRectangleData(0, rectangle); // Initialize with transparent
+                holdBrickRectangles[i][j] = rectangle;
+                holdBrickPanel.add(rectangle, j, i);
             }
         }
     }
@@ -330,37 +407,77 @@ public class GuiController implements Initializable {
             return;
         }
 
-        final int HOLD_BRICK_SIZE = 15; // Smaller size for preview
-
-        if (holdBrickData == null) {
-            // Clear the hold panel if no brick is held
-            if (holdBrickRectangles != null) {
-                holdBrickPanel.getChildren().clear();
-                holdBrickRectangles = null;
-            }
-            return;
+        // Ensure grid is initialized (even if no brick is held)
+        if (holdBrickRectangles == null) {
+            initializeHoldBrickGrid();
         }
 
-        if (holdBrickRectangles == null
-                || holdBrickRectangles.length != holdBrickData.length
-                || holdBrickRectangles[0].length != holdBrickData[0].length) {
-            holdBrickPanel.getChildren().clear();
-            holdBrickRectangles = new Rectangle[holdBrickData.length][holdBrickData[0].length];
+        // Clear all rectangles first
+        for (int i = 0; i < PREVIEW_GRID_SIZE; i++) {
+            for (int j = 0; j < PREVIEW_GRID_SIZE; j++) {
+                setRectangleData(0, holdBrickRectangles[i][j]);
+            }
+        }
+
+        // If there's a brick to display, place it centered within the grid
+        if (holdBrickData != null) {
+            // Calculate offset to center the brick within the 4x4 grid
+            int[] offset = calculateCenteringOffset(holdBrickData, PREVIEW_GRID_SIZE);
+
+            // Place the brick centered within the grid
             for (int i = 0; i < holdBrickData.length; i++) {
                 for (int j = 0; j < holdBrickData[i].length; j++) {
-                    Rectangle rectangle = new Rectangle(HOLD_BRICK_SIZE, HOLD_BRICK_SIZE);
-                    rectangle.setFill(Color.TRANSPARENT);
-                    setRectangleData(0, rectangle); // Initialize with transparent
-                    holdBrickRectangles[i][j] = rectangle;
-                    holdBrickPanel.add(rectangle, j, i);
+                    int targetRow = i + offset[0];
+                    int targetCol = j + offset[1];
+                    if (targetRow >= 0 && targetRow < PREVIEW_GRID_SIZE && 
+                        targetCol >= 0 && targetCol < PREVIEW_GRID_SIZE) {
+                        setRectangleData(holdBrickData[i][j], holdBrickRectangles[targetRow][targetCol]);
+                    }
                 }
             }
         }
-
-        for (int i = 0; i < holdBrickData.length; i++) {
-            for (int j = 0; j < holdBrickData[i].length; j++) {
-                setRectangleData(holdBrickData[i][j], holdBrickRectangles[i][j]);
+    }
+    
+    /**
+     * Calculates the offset needed to center a brick within a fixed-size grid.
+     * Finds the bounding box of the actual brick (non-zero values) and centers it.
+     * Returns an array [rowOffset, colOffset] to center the brick.
+     */
+    private int[] calculateCenteringOffset(int[][] brickData, int gridSize) {
+        if (brickData == null || brickData.length == 0 || brickData[0].length == 0) {
+            return new int[]{0, 0};
+        }
+        
+        // Find the bounding box of the actual brick (non-zero values)
+        int minRow = brickData.length;
+        int maxRow = -1;
+        int minCol = brickData[0].length;
+        int maxCol = -1;
+        
+        for (int i = 0; i < brickData.length; i++) {
+            for (int j = 0; j < brickData[i].length; j++) {
+                if (brickData[i][j] != 0) {
+                    minRow = Math.min(minRow, i);
+                    maxRow = Math.max(maxRow, i);
+                    minCol = Math.min(minCol, j);
+                    maxCol = Math.max(maxCol, j);
+                }
             }
         }
+        
+        // If no non-zero values found, return no offset
+        if (maxRow < minRow || maxCol < minCol) {
+            return new int[]{0, 0};
+        }
+        
+        // Calculate the actual dimensions of the brick
+        int actualBrickRows = maxRow - minRow + 1;
+        int actualBrickCols = maxCol - minCol + 1;
+        
+        // Calculate offset to center the bounding box within the grid
+        int rowOffset = (gridSize - actualBrickRows) / 2 - minRow;
+        int colOffset = (gridSize - actualBrickCols) / 2 - minCol;
+        
+        return new int[]{rowOffset, colOffset};
     }
 }

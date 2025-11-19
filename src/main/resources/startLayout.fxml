@@ -20,11 +20,7 @@
             </StackPane.margin>
             <BorderPane>
                 <top>
-                    <Text text="TETRIS" style="-fx-fill: #00FF00;">
-                        <font>
-                            <Font name="Let's go Digital" size="24"/>
-                        </font>
-                    </Text>
+                    <Text fx:id="titleText" text="TETRIS" style="-fx-fill: #00FF00;"/>
                 </top>
                 <center>
                     <Button fx:id="playButton"
