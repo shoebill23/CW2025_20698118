@@ -14,12 +14,16 @@ import javafx.scene.control.Label;
 import javafx.scene.effect.Reflection;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -35,6 +39,9 @@ public class GuiController implements Initializable {
 
     @FXML
     private GridPane brickPanel;
+    
+    @FXML
+    private Group gridLines;
 
     @FXML
     private GridPane nextBrickPanel;
@@ -43,12 +50,12 @@ public class GuiController implements Initializable {
     private GridPane holdBrickPanel;
 
     @FXML
-    private GameOverPanel gameOverPanel;
-
-    @FXML
     private Group groupPause;
-
-    private PauseMenuController pauseMenuController;
+    
+    @FXML
+    private Group groupGameOver;
+    
+    private GameOverMenuController gameOverMenuController;
 
     @FXML
     private Label scoreLabel;
@@ -60,7 +67,15 @@ public class GuiController implements Initializable {
     private Label scoreTitleLabel;
     
     @FXML
+    private Label highScoreTitleLabel;
+    
+    @FXML
+    private Label highScoreLabel;
+    
+    @FXML
     private Label nextBrickLabel;
+
+    private PauseMenuController pauseMenuController;
 
     private Rectangle[][] displayMatrix;
 
@@ -117,9 +132,6 @@ public class GuiController implements Initializable {
                         keyEvent.consume();
                     }
                 }
-                if (keyEvent.getCode() == KeyCode.N) {
-                    newGame(null);
-                }
                 // ESC key works both when paused and unpaused
                 if (keyEvent.getCode() == KeyCode.ESCAPE) {
                     togglePause();
@@ -127,12 +139,32 @@ public class GuiController implements Initializable {
                 }
             }
         });
-        gameOverPanel.setVisible(false);
-        groupPause.setVisible(false);
+        if (groupGameOver != null) {
+            groupGameOver.setVisible(false);
+        }
+        if (groupPause != null) {
+            groupPause.setVisible(false);
+        }
         
         // Load pause menu manually to avoid fx:include issues
         loadPauseMenu();
         
+        // Load game over menu manually
+        loadGameOverMenu();
+        
+        // Initialize high score display
+        updateHighScoreDisplay();
+        
+        // Apply fonts to high score labels
+        String fontFamily = FontLoader.loadFont();
+        if (fontFamily != null) {
+            if (highScoreTitleLabel != null) {
+                highScoreTitleLabel.setFont(FontLoader.getFont(20));
+            }
+            if (highScoreLabel != null) {
+                highScoreLabel.setFont(FontLoader.getFont(24));
+            }
+        }
 
         final Reflection reflection = new Reflection();
         reflection.setFraction(0.8);
@@ -150,6 +182,9 @@ public class GuiController implements Initializable {
                 gamePanel.add(rectangle, j, i - 2);
             }
         }
+        
+        // Create white grid lines
+        createGridLines(boardMatrix[0].length, boardMatrix.length - 2);
 
         rectangles = new Rectangle[brick.getBrickData().length][brick.getBrickData()[0].length];
         for (int i = 0; i < brick.getBrickData().length; i++) {
@@ -176,6 +211,47 @@ public class GuiController implements Initializable {
         timeLine.play();
     }
 
+   
+    private void createGridLines(int columns, int visibleRows) {
+        if (gridLines == null) {
+            return;
+        }
+        
+        gridLines.getChildren().clear();
+        
+        
+        final double HGAP = 1.0;
+        final double VGAP = 1.0;
+        
+        
+        double cellSpacingX = BRICK_SIZE + HGAP;
+        double cellSpacingY = BRICK_SIZE + VGAP;
+        
+        double totalWidth = columns * BRICK_SIZE + (columns - 1) * HGAP;
+        double totalHeight = visibleRows * BRICK_SIZE + (visibleRows - 1) * VGAP;
+        
+        
+        final double STROKE_EXTENSION = 0.5;
+        
+
+        for (int i = 0; i <= columns; i++) {
+            double x = i * cellSpacingX;
+            Line verticalLine = new Line(x, -STROKE_EXTENSION, x, totalHeight + STROKE_EXTENSION);
+            verticalLine.setStroke(Color.WHITE);
+            verticalLine.setStrokeWidth(0.5);
+            gridLines.getChildren().add(verticalLine);
+        }
+        
+
+        for (int i = 0; i <= visibleRows; i++) {
+            double y = i * cellSpacingY;
+            Line horizontalLine = new Line(-STROKE_EXTENSION, y, totalWidth + STROKE_EXTENSION, y);
+            horizontalLine.setStroke(Color.WHITE);
+            horizontalLine.setStrokeWidth(0.5);
+            gridLines.getChildren().add(horizontalLine);
+        }
+    }
+    
     private Paint getFillColor(int i) {
         Paint returnPaint;
         switch (i) {
@@ -268,25 +344,78 @@ public class GuiController implements Initializable {
         this.eventListener = eventListener;
     }
 
+    private IntegerProperty scoreProperty;
+    
     public void bindScore(IntegerProperty integerProperty) {
+        this.scoreProperty = integerProperty;
         scoreLabel.textProperty().bind(integerProperty.asString());
+    }
+    
+
+    private void updateHighScoreDisplay() {
+        int highScore = HighScoreManager.getHighScore();
+        if (highScoreLabel != null) {
+            highScoreLabel.setText(String.valueOf(highScore));
+        }
     }
 
     public void gameOver() {
         timeLine.stop();
-        gameOverPanel.setVisible(true);
+        System.out.println("gameOver() called");
+        
+
+        if (scoreProperty != null) {
+            int currentScore = scoreProperty.get();
+            HighScoreManager.saveScore(currentScore);
+            System.out.println("Score saved: " + currentScore);
+
+
+            updateHighScoreDisplay();
+        }
+        
+        if (groupGameOver != null) {
+            groupGameOver.setVisible(true);
+            groupGameOver.toFront();
+            System.out.println("groupGameOver.setVisible(true) - visible: " + groupGameOver.isVisible());
+        } else {
+            System.err.println("ERROR: groupGameOver is null!");
+        }
+        
         isGameOver.setValue(Boolean.TRUE);
     }
 
     public void newGame(ActionEvent actionEvent) {
         timeLine.stop();
-        gameOverPanel.setVisible(false);
-        groupPause.setVisible(false);
+        if (groupGameOver != null) {
+            groupGameOver.setVisible(false);
+        }
+        if (groupPause != null) {
+            groupPause.setVisible(false);
+        }
         eventListener.createNewGame();
+
+
+        updateHighScoreDisplay();
         gamePanel.requestFocus();
         timeLine.play();
         isPause.setValue(Boolean.FALSE);
         isGameOver.setValue(Boolean.FALSE);
+    }
+
+    public void quitToMainMenu() {
+        try {
+
+
+            if (timeLine != null) {
+                timeLine.stop();
+            }
+            Parent mainMenuRoot = javafx.fxml.FXMLLoader.load(getClass().getResource("/mainMenu.fxml"));
+            Scene scene = gamePanel.getScene();
+            scene.setRoot(mainMenuRoot);
+        } catch (IOException e) {
+            System.err.println("Failed to load mainMenu.fxml");
+            e.printStackTrace();
+        }
     }
 
     public void pauseGame(ActionEvent actionEvent) {
@@ -294,6 +423,11 @@ public class GuiController implements Initializable {
     }
 
     private void loadPauseMenu() {
+        if (groupPause == null) {
+            System.err.println("ERROR: groupPause is null! Cannot load pause menu.");
+            return;
+        }
+        
         try {
             URL pauseMenuLocation = getClass().getClassLoader().getResource("pauseMenu.fxml");
             if (pauseMenuLocation == null) {
@@ -307,8 +441,9 @@ public class GuiController implements Initializable {
             
             if (pauseMenuController != null) {
                 pauseMenuController.setGuiController(this);
+                groupPause.getChildren().clear(); // Clear previous content if any
                 groupPause.getChildren().add(pauseMenuRoot);
-                System.out.println("Pause menu loaded successfully");
+                System.out.println("Pause menu loaded successfully into groupPause");
             } else {
                 System.err.println("Warning: Pause menu controller is null after loading");
             }
@@ -318,21 +453,61 @@ public class GuiController implements Initializable {
         }
     }
     
+    private void loadGameOverMenu() {
+        if (groupGameOver == null) {
+            System.err.println("ERROR: groupGameOver is null! Cannot load game over menu.");
+            return;
+        }
+        
+        try {
+            URL gameOverMenuLocation = getClass().getClassLoader().getResource("gameOverMenu.fxml");
+            if (gameOverMenuLocation == null) {
+                System.err.println("Error: Could not find gameOverMenu.fxml resource");
+                return;
+            }
+            
+            javafx.fxml.FXMLLoader gameOverMenuLoader = new javafx.fxml.FXMLLoader(gameOverMenuLocation);
+            javafx.scene.Parent gameOverMenuRoot = gameOverMenuLoader.load();
+            gameOverMenuController = gameOverMenuLoader.getController();
+            
+            if (gameOverMenuController != null) {
+                gameOverMenuController.setGuiController(this);
+                groupGameOver.getChildren().clear(); 
+                groupGameOver.getChildren().add(gameOverMenuRoot);
+                System.out.println("Game over menu loaded successfully into groupGameOver");
+            } else {
+                System.err.println("Warning: Game over menu controller is null after loading");
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading game over menu: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
     private void togglePause() {
         if (isGameOver.getValue() == Boolean.TRUE) {
-            return; // Don't allow pausing when game is over
+            return; 
         }
         
         if (isPause.getValue() == Boolean.FALSE) {
-            // Pause the game
+
             timeLine.pause();
             isPause.setValue(Boolean.TRUE);
-            groupPause.setVisible(true);
+            if (groupPause != null) {
+                groupPause.setVisible(true);
+                groupPause.toFront();
+                System.out.println("Pause menu set to visible - visible: " + groupPause.isVisible());
+            } else {
+                System.err.println("ERROR: groupPause is null in togglePause()!");
+            }
         } else {
-            // Resume the game
+            
             timeLine.play();
             isPause.setValue(Boolean.FALSE);
-            groupPause.setVisible(false);
+            if (groupPause != null) {
+                groupPause.setVisible(false);
+                System.out.println("Pause menu set to invisible");
+            }
         }
         gamePanel.requestFocus();
     }
@@ -342,7 +517,6 @@ public class GuiController implements Initializable {
             return;
         }
 
-        // Initialize fixed 4x4 grid if not already created
         if (nextBrickRectangles == null) {
             nextBrickPanel.getChildren().clear();
             nextBrickRectangles = new Rectangle[PREVIEW_GRID_SIZE][PREVIEW_GRID_SIZE];
@@ -350,7 +524,7 @@ public class GuiController implements Initializable {
                 for (int j = 0; j < PREVIEW_GRID_SIZE; j++) {
                     Rectangle rectangle = new Rectangle(PREVIEW_BRICK_SIZE, PREVIEW_BRICK_SIZE);
                     rectangle.setFill(Color.TRANSPARENT);
-                    setRectangleData(0, rectangle); // Initialize with transparent
+                    setRectangleData(0, rectangle); 
                     nextBrickRectangles[i][j] = rectangle;
                     nextBrickPanel.add(rectangle, j, i);
                 }
@@ -438,11 +612,7 @@ public class GuiController implements Initializable {
         }
     }
     
-    /**
-     * Calculates the offset needed to center a brick within a fixed-size grid.
-     * Finds the bounding box of the actual brick (non-zero values) and centers it.
-     * Returns an array [rowOffset, colOffset] to center the brick.
-     */
+
     private int[] calculateCenteringOffset(int[][] brickData, int gridSize) {
         if (brickData == null || brickData.length == 0 || brickData[0].length == 0) {
             return new int[]{0, 0};

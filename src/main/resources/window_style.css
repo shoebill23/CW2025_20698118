@@ -1,6 +1,6 @@
 .root {
-    background-image: url("background_image.png");
-    -fx-background-image: url("background_image.png");
+    background-image: url("BlackBackground.jpg");
+    -fx-background-image: url("BlackBackground.jpg");
 }
 
 .nextBrick {

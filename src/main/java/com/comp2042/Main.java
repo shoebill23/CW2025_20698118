@@ -30,7 +30,7 @@ public class Main extends Application {
         Parent root = fxmlLoader.load();
         StartController startController = fxmlLoader.getController();
 
-        primaryStage.setTitle("TetrisJFX");
+        primaryStage.setTitle("Tetris");
         Scene scene = new Scene(root, 300, 510);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);

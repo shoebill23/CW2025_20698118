@@ -79,7 +79,7 @@ public class StartController {
             }
             System.out.println("GuiController obtained: " + guiController);
             
-            Scene gameScene = new Scene(gameRoot, 625, 650);
+            Scene gameScene = new Scene(gameRoot, 600, 600);
             primaryStage.setScene(gameScene);
             primaryStage.setResizable(false);
             primaryStage.show();

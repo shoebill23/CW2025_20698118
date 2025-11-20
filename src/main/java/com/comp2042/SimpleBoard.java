@@ -185,9 +185,12 @@ public class SimpleBoard implements Board {
     }
     
     @Override
-    public void hardDrop() {
+    public int hardDrop() {
         int[][] currentMatrix = MatrixOperations.copy(currentGameMatrix);
         int[][] currentShape = brickRotator.getCurrentShape();
+        
+        // Store the starting Y position
+        int startY = (int) currentOffset.getY();
         
         // Find the lowest valid Y position
         Point p = new Point(currentOffset);
@@ -202,5 +205,9 @@ public class SimpleBoard implements Board {
         }
         // Move brick to the lowest valid position
         currentOffset = p;
+        
+        // Calculate and return the number of rows dropped
+        int endY = (int) currentOffset.getY();
+        return endY - startY;
     }
 }

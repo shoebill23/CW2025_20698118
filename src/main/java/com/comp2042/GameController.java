@@ -77,19 +77,25 @@ public class GameController implements InputEventListener {
     
     @Override
     public DownData onHardDropEvent() {
-        // Perform hard drop - move brick to lowest possible position
-        board.hardDrop();
         
-        // Merge brick to background
+        int rowsDropped = board.hardDrop();
+        
+        
+        if (rowsDropped > 0) {
+            int hardDropScore = 2 * rowsDropped;
+            board.getScore().add(hardDropScore);
+        }
+        
+        
         board.mergeBrickToBackground();
         
-        // Clear rows and calculate score
+        
         ClearRow clearRow = board.clearRows();
         if (clearRow.getLinesRemoved() > 0) {
             board.getScore().add(clearRow.getScoreBonus());
         }
         
-        // Check for game over
+        
         if (board.isGameOver()) {
             viewGuiController.gameOver();
         } else {
@@ -97,10 +103,10 @@ public class GameController implements InputEventListener {
             ((SimpleBoard) board).resetCanHold();
         }
         
-        // Refresh the game background
+        
         viewGuiController.refreshGameBackground(board.getBoardMatrix());
         
-        // Return the view data (which will be for the new brick)
+        
         return new DownData(clearRow, board.getViewData());
     }
     
