@@ -23,6 +23,9 @@ public class PauseMenuController {
     private Button restartButton;
     
     @FXML
+    private Button controlsButton;
+    
+    @FXML
     private Button quitButton;
 
     public void setGuiController(GuiController guiController) {
@@ -40,6 +43,9 @@ public class PauseMenuController {
             if (restartButton != null) {
                 restartButton.setFont(FontLoader.getFont(16));
             }
+            if (controlsButton != null) {
+                controlsButton.setFont(FontLoader.getFont(16));
+            }
             if (quitButton != null) {
                 quitButton.setFont(FontLoader.getFont(16));
             }
@@ -50,6 +56,13 @@ public class PauseMenuController {
     private void onRestartClicked(ActionEvent event) {
         if (guiController != null) {
             guiController.newGame(event);
+        }
+    }
+
+    @FXML
+    private void onControlsClicked(ActionEvent event) {
+        if (guiController != null) {
+            guiController.showControlsMenu();
         }
     }
 

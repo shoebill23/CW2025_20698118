@@ -41,6 +41,7 @@
     <Group fx:id="groupNotification" layoutX="195" layoutY="203"/>
     <Group fx:id="groupGameOver" layoutX="183" layoutY="175"/>
     <Group fx:id="groupPause" layoutX="183" layoutY="175"/>
+    <Group fx:id="groupControls" layoutX="183" layoutY="175"/>
     <stylesheets>
         <URL value="@window_style.css"/>
     </stylesheets>

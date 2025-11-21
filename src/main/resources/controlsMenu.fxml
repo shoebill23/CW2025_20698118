@@ -1,0 +1,27 @@
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.geometry.Insets?>
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="com.comp2042.ControlsMenuController"
+      alignment="CENTER" spacing="15"
+      style="-fx-background-color: rgba(0, 0, 0, 0.7); -fx-border-color: white; -fx-border-width: 2;">
+
+    <padding>
+        <Insets top="20" right="40" bottom="20" left="40"/>
+    </padding>
+
+    <Label fx:id="controlsLabel" text="CONTROLS" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
+    
+    <VBox spacing="10" alignment="CENTER_LEFT">
+        <Label fx:id="escLabel" text="ESC - Pause" style="-fx-text-fill: white;"/>
+        <Label fx:id="spaceLabel" text="Space Bar - Hard Drop" style="-fx-text-fill: white;"/>
+        <Label fx:id="downLabel" text="Down / S - Soft Drop" style="-fx-text-fill: white;"/>
+        <Label fx:id="leftLabel" text="Left / A - Move Left" style="-fx-text-fill: white;"/>
+        <Label fx:id="rightLabel" text="Right / D - Move Right" style="-fx-text-fill: white;"/>
+        <Label fx:id="upLabel" text="Up / W - Rotate Brick" style="-fx-text-fill: white;"/>
+    </VBox>
+    
+    <Button fx:id="backButton" text="Back" onAction="#onBackClicked" prefWidth="120" prefHeight="40"/>
+</VBox>
+

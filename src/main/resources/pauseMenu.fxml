@@ -13,5 +13,6 @@
 
     <Label fx:id="pausedLabel" text="PAUSED" style="-fx-text-fill: white; -fx-font-weight: bold;"/>
     <Button fx:id="restartButton" text="Restart" onAction="#onRestartClicked" prefWidth="120" prefHeight="40"/>
+    <Button fx:id="controlsButton" text="Controls" onAction="#onControlsClicked" prefWidth="120" prefHeight="40"/>
     <Button fx:id="quitButton" text="Quit" onAction="#onQuitClicked" prefWidth="120" prefHeight="40"/>
 </VBox>

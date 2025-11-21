@@ -55,7 +55,12 @@ public class GuiController implements Initializable {
     @FXML
     private Group groupGameOver;
     
+    @FXML
+    private Group groupControls;
+    
     private GameOverMenuController gameOverMenuController;
+    
+    private ControlsMenuController controlsMenuController;
 
     @FXML
     private Label scoreLabel;
@@ -145,12 +150,18 @@ public class GuiController implements Initializable {
         if (groupPause != null) {
             groupPause.setVisible(false);
         }
+        if (groupControls != null) {
+            groupControls.setVisible(false);
+        }
         
         // Load pause menu manually to avoid fx:include issues
         loadPauseMenu();
         
         // Load game over menu manually
         loadGameOverMenu();
+        
+        // Load controls menu manually
+        loadControlsMenu();
         
         // Initialize high score display
         updateHighScoreDisplay();
@@ -484,6 +495,37 @@ public class GuiController implements Initializable {
         }
     }
     
+    private void loadControlsMenu() {
+        if (groupControls == null) {
+            System.err.println("ERROR: groupControls is null! Cannot load controls menu.");
+            return;
+        }
+        
+        try {
+            URL controlsMenuLocation = getClass().getClassLoader().getResource("controlsMenu.fxml");
+            if (controlsMenuLocation == null) {
+                System.err.println("Error: Could not find controlsMenu.fxml resource");
+                return;
+            }
+            
+            javafx.fxml.FXMLLoader controlsMenuLoader = new javafx.fxml.FXMLLoader(controlsMenuLocation);
+            javafx.scene.Parent controlsMenuRoot = controlsMenuLoader.load();
+            controlsMenuController = controlsMenuLoader.getController();
+            
+            if (controlsMenuController != null) {
+                controlsMenuController.setGuiController(this);
+                groupControls.getChildren().clear(); 
+                groupControls.getChildren().add(controlsMenuRoot);
+                System.out.println("Controls menu loaded successfully into groupControls");
+            } else {
+                System.err.println("Warning: Controls menu controller is null after loading");
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading controls menu: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
     private void togglePause() {
         if (isGameOver.getValue() == Boolean.TRUE) {
             return; 
@@ -510,6 +552,32 @@ public class GuiController implements Initializable {
             }
         }
         gamePanel.requestFocus();
+    }
+    
+    public void showControlsMenu() {
+        if (groupControls != null) {
+            groupControls.setVisible(true);
+            groupControls.toFront();
+            if (groupPause != null) {
+                groupPause.setVisible(false);
+            }
+            System.out.println("Controls menu set to visible");
+        } else {
+            System.err.println("ERROR: groupControls is null in showControlsMenu()!");
+        }
+    }
+    
+    public void showPauseMenu() {
+        if (groupPause != null) {
+            groupPause.setVisible(true);
+            groupPause.toFront();
+            if (groupControls != null) {
+                groupControls.setVisible(false);
+            }
+            System.out.println("Pause menu set to visible");
+        } else {
+            System.err.println("ERROR: groupPause is null in showPauseMenu()!");
+        }
     }
 
     private void updateNextBrick(int[][] nextBrickData) {
