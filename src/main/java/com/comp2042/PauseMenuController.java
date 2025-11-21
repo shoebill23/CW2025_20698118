@@ -10,6 +10,10 @@ import java.io.IOException;
 
 public class PauseMenuController {
 
+    //Constants
+    private static final double FONT_SIZE_PAUSE_TITLE = 28;
+    private static final double FONT_SIZE_MENU_BUTTON = 16;
+
     private GuiController guiController;
     
     @FXML
@@ -37,19 +41,19 @@ public class PauseMenuController {
         String fontFamily = FontLoader.loadFont();
         if (fontFamily != null) {
             if (pausedLabel != null) {
-                pausedLabel.setFont(FontLoader.getFont(28));
+                pausedLabel.setFont(FontLoader.getFont(FONT_SIZE_PAUSE_TITLE));
             }
             if (restartButton != null) {
-                restartButton.setFont(FontLoader.getFont(16));
+                restartButton.setFont(FontLoader.getFont(FONT_SIZE_MENU_BUTTON));
             }
             if (controlsButton != null) {
-                controlsButton.setFont(FontLoader.getFont(16));
+                controlsButton.setFont(FontLoader.getFont(FONT_SIZE_MENU_BUTTON));
             }
             if (quitButton != null) {
-                quitButton.setFont(FontLoader.getFont(16));
+                quitButton.setFont(FontLoader.getFont(FONT_SIZE_MENU_BUTTON));
             }
             if (resumeButton != null) {
-                resumeButton.setFont(FontLoader.getFont(16));
+                resumeButton.setFont(FontLoader.getFont(FONT_SIZE_MENU_BUTTON));
             }
         }
     }

@@ -24,7 +24,21 @@ import java.util.ResourceBundle;
 
 public class GuiController implements Initializable {
 
+    //Constants
     private static final int BRICK_SIZE = 20;
+    private static final int BOARD_OFFSET_ROW = 2;
+    private static final int BRICK_PANEL_Y_OFFSET = -42;
+    private static final double GRID_HGAP = 1.0;
+    private static final double GRID_VGAP = 1.0;
+    private static final double GRID_STROKE_EXTENSION = 0.5;
+    private static final double GRID_LINE_WIDTH = 0.5;
+    private static final double RECTANGLE_ARC_SIZE = 9;
+    private static final double FONT_SIZE_HIGH_SCORE_TITLE = 20;
+    private static final double FONT_SIZE_HIGH_SCORE_VALUE = 24;
+    private static final int GAME_TICK_MS = 400;
+    private static final String PAUSE_MENU_FXML = "pauseMenu.fxml";
+    private static final String GAME_OVER_MENU_FXML = "gameOverMenu.fxml";
+    private static final String CONTROLS_MENU_FXML = "controlsMenu.fxml";
 
     @FXML
     private GridPane gamePanel;
@@ -157,27 +171,27 @@ public class GuiController implements Initializable {
         String fontFamily = FontLoader.loadFont();
         if (fontFamily != null) {
             if (highScoreTitleLabel != null) {
-                highScoreTitleLabel.setFont(FontLoader.getFont(20));
+                highScoreTitleLabel.setFont(FontLoader.getFont(FONT_SIZE_HIGH_SCORE_TITLE));
             }
             if (highScoreLabel != null) {
-                highScoreLabel.setFont(FontLoader.getFont(24));
+                highScoreLabel.setFont(FontLoader.getFont(FONT_SIZE_HIGH_SCORE_VALUE));
             }
         }
     }
 
     public void initGameView(int[][] boardMatrix, ViewData brick) {
         displayMatrix = new Rectangle[boardMatrix.length][boardMatrix[0].length];
-        for (int i = 2; i < boardMatrix.length; i++) {
+        for (int i = BOARD_OFFSET_ROW; i < boardMatrix.length; i++) {
             for (int j = 0; j < boardMatrix[i].length; j++) {
                 Rectangle rectangle = new Rectangle(BRICK_SIZE, BRICK_SIZE);
                 rectangle.setFill(Color.TRANSPARENT);
                 displayMatrix[i][j] = rectangle;
-                gamePanel.add(rectangle, j, i - 2);
+                gamePanel.add(rectangle, j, i - BOARD_OFFSET_ROW);
             }
         }
         
         // Create white grid lines
-        createGridLines(boardMatrix[0].length, boardMatrix.length - 2);
+        createGridLines(boardMatrix[0].length, boardMatrix.length - BOARD_OFFSET_ROW);
 
         rectangles = new Rectangle[brick.getBrickData().length][brick.getBrickData()[0].length];
         for (int i = 0; i < brick.getBrickData().length; i++) {
@@ -189,7 +203,7 @@ public class GuiController implements Initializable {
             }
         }
         brickPanel.setLayoutX(gamePanel.getLayoutX() + brick.getxPosition() * brickPanel.getVgap() + brick.getxPosition() * BRICK_SIZE);
-        brickPanel.setLayoutY(-42 + gamePanel.getLayoutY() + brick.getyPosition() * brickPanel.getHgap() + brick.getyPosition() * BRICK_SIZE);
+        brickPanel.setLayoutY(BRICK_PANEL_Y_OFFSET + gamePanel.getLayoutY() + brick.getyPosition() * brickPanel.getHgap() + brick.getyPosition() * BRICK_SIZE);
 
         updateNextBrick(brick.getNextBrickData());
         
@@ -197,7 +211,7 @@ public class GuiController implements Initializable {
         initializeHoldBrickGrid();
 
         timeLine = new Timeline(new KeyFrame(
-                Duration.millis(400),
+                Duration.millis(GAME_TICK_MS),
                 ae -> moveDown(new MoveEvent(EventSource.THREAD))
         ));
         timeLine.setCycleCount(Timeline.INDEFINITE);
@@ -212,35 +226,27 @@ public class GuiController implements Initializable {
         
         gridLines.getChildren().clear();
         
+        double cellSpacingX = BRICK_SIZE + GRID_HGAP;
+        double cellSpacingY = BRICK_SIZE + GRID_VGAP;
         
-        final double HGAP = 1.0;
-        final double VGAP = 1.0;
-        
-        
-        double cellSpacingX = BRICK_SIZE + HGAP;
-        double cellSpacingY = BRICK_SIZE + VGAP;
-        
-        double totalWidth = columns * BRICK_SIZE + (columns - 1) * HGAP;
-        double totalHeight = visibleRows * BRICK_SIZE + (visibleRows - 1) * VGAP;
-        
-        
-        final double STROKE_EXTENSION = 0.5;
+        double totalWidth = columns * BRICK_SIZE + (columns - 1) * GRID_HGAP;
+        double totalHeight = visibleRows * BRICK_SIZE + (visibleRows - 1) * GRID_VGAP;
         
 
         for (int i = 0; i <= columns; i++) {
             double x = i * cellSpacingX;
-            Line verticalLine = new Line(x, -STROKE_EXTENSION, x, totalHeight + STROKE_EXTENSION);
+            Line verticalLine = new Line(x, -GRID_STROKE_EXTENSION, x, totalHeight + GRID_STROKE_EXTENSION);
             verticalLine.setStroke(Color.WHITE);
-            verticalLine.setStrokeWidth(0.5);
+            verticalLine.setStrokeWidth(GRID_LINE_WIDTH);
             gridLines.getChildren().add(verticalLine);
         }
         
 
         for (int i = 0; i <= visibleRows; i++) {
             double y = i * cellSpacingY;
-            Line horizontalLine = new Line(-STROKE_EXTENSION, y, totalWidth + STROKE_EXTENSION, y);
+            Line horizontalLine = new Line(-GRID_STROKE_EXTENSION, y, totalWidth + GRID_STROKE_EXTENSION, y);
             horizontalLine.setStroke(Color.WHITE);
-            horizontalLine.setStrokeWidth(0.5);
+            horizontalLine.setStrokeWidth(GRID_LINE_WIDTH);
             gridLines.getChildren().add(horizontalLine);
         }
     }
@@ -283,7 +289,7 @@ public class GuiController implements Initializable {
     private void refreshBrick(ViewData brick) {
         if (isPause.getValue() == Boolean.FALSE) {
             brickPanel.setLayoutX(gamePanel.getLayoutX() + brick.getxPosition() * brickPanel.getVgap() + brick.getxPosition() * BRICK_SIZE);
-            brickPanel.setLayoutY(-42 + gamePanel.getLayoutY() + brick.getyPosition() * brickPanel.getHgap() + brick.getyPosition() * BRICK_SIZE);
+            brickPanel.setLayoutY(BRICK_PANEL_Y_OFFSET + gamePanel.getLayoutY() + brick.getyPosition() * brickPanel.getHgap() + brick.getyPosition() * BRICK_SIZE);
             for (int i = 0; i < brick.getBrickData().length; i++) {
                 for (int j = 0; j < brick.getBrickData()[i].length; j++) {
                     setRectangleData(brick.getBrickData()[i][j], rectangles[i][j]);
@@ -294,7 +300,7 @@ public class GuiController implements Initializable {
     }
 
     public void refreshGameBackground(int[][] board) {
-        for (int i = 2; i < board.length; i++) {
+        for (int i = BOARD_OFFSET_ROW; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
                 setRectangleData(board[i][j], displayMatrix[i][j]);
             }
@@ -303,8 +309,8 @@ public class GuiController implements Initializable {
 
     private void setRectangleData(int color, Rectangle rectangle) {
         rectangle.setFill(getFillColor(color));
-        rectangle.setArcHeight(9);
-        rectangle.setArcWidth(9);
+        rectangle.setArcHeight(RECTANGLE_ARC_SIZE);
+        rectangle.setArcWidth(RECTANGLE_ARC_SIZE);
     }
 
     private void moveDown(MoveEvent event) {
@@ -417,7 +423,7 @@ public class GuiController implements Initializable {
         }
         
         try {
-            URL pauseMenuLocation = getClass().getClassLoader().getResource("pauseMenu.fxml");
+            URL pauseMenuLocation = getClass().getClassLoader().getResource(PAUSE_MENU_FXML);
             if (pauseMenuLocation == null) {
                 System.err.println("Error: Could not find pauseMenu.fxml resource");
                 return;
@@ -448,7 +454,7 @@ public class GuiController implements Initializable {
         }
         
         try {
-            URL gameOverMenuLocation = getClass().getClassLoader().getResource("gameOverMenu.fxml");
+            URL gameOverMenuLocation = getClass().getClassLoader().getResource(GAME_OVER_MENU_FXML);
             if (gameOverMenuLocation == null) {
                 System.err.println("Error: Could not find gameOverMenu.fxml resource");
                 return;
@@ -479,7 +485,7 @@ public class GuiController implements Initializable {
         }
         
         try {
-            URL controlsMenuLocation = getClass().getClassLoader().getResource("controlsMenu.fxml");
+            URL controlsMenuLocation = getClass().getClassLoader().getResource(CONTROLS_MENU_FXML);
             if (controlsMenuLocation == null) {
                 System.err.println("Error: Could not find controlsMenu.fxml resource");
                 return;

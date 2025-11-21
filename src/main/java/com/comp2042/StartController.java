@@ -14,6 +14,13 @@ import java.net.URL;
 
 public class StartController {
 
+    //Constants
+    private static final double FONT_SIZE_TITLE = 32;
+    private static final double FONT_SIZE_PLAY_BUTTON = 20;
+    private static final int GAME_SCENE_WIDTH = 600;
+    private static final int GAME_SCENE_HEIGHT = 600;
+    private static final String GAME_LAYOUT_FXML = "gameLayout.fxml";
+
     @FXML
     private Text titleText;
 
@@ -34,14 +41,14 @@ public class StartController {
         if (fontFamily != null) {
             // Apply font to title text
             if (titleText != null) {
-                titleText.setFont(FontLoader.getFont(32));
+                titleText.setFont(FontLoader.getFont(FONT_SIZE_TITLE));
                 System.out.println("  - Applied font to titleText");
             } else {
                 System.err.println("  - titleText is null!");
             }
             // Apply font to button
             if (playButton != null) {
-                playButton.setFont(FontLoader.getFont(20));
+                playButton.setFont(FontLoader.getFont(FONT_SIZE_PLAY_BUTTON));
                 System.out.println("  - Applied font to playButton");
             } else {
                 System.err.println("  - playButton is null!");
@@ -61,7 +68,7 @@ public class StartController {
                 return;
             }
             
-            URL location = getClass().getClassLoader().getResource("gameLayout.fxml");
+            URL location = getClass().getClassLoader().getResource(GAME_LAYOUT_FXML);
             if (location == null) {
                 System.err.println("Error: Could not find gameLayout.fxml resource");
                 return;
@@ -79,7 +86,7 @@ public class StartController {
             }
             System.out.println("GuiController obtained: " + guiController);
             
-            Scene gameScene = new Scene(gameRoot, 600, 600);
+            Scene gameScene = new Scene(gameRoot, GAME_SCENE_WIDTH, GAME_SCENE_HEIGHT);
             primaryStage.setScene(gameScene);
             primaryStage.setResizable(false);
             primaryStage.show();

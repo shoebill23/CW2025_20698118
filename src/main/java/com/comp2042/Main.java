@@ -11,6 +11,12 @@ import java.util.ResourceBundle;
 
 public class Main extends Application {
 
+    //Constants
+    private static final String WINDOW_TITLE = "Tetris";
+    private static final int START_SCENE_WIDTH = 600;
+    private static final int START_SCENE_HEIGHT = 600;
+    private static final String START_LAYOUT_FXML = "startLayout.fxml";
+
     @Override
     public void init() throws Exception {
         // Load the font early, before any FXML is loaded
@@ -24,14 +30,14 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        URL location = getClass().getClassLoader().getResource("startLayout.fxml");
+        URL location = getClass().getClassLoader().getResource(START_LAYOUT_FXML);
         ResourceBundle resources = null;
         FXMLLoader fxmlLoader = new FXMLLoader(location, resources);
         Parent root = fxmlLoader.load();
         StartController startController = fxmlLoader.getController();
 
-        primaryStage.setTitle("Tetris");
-        Scene scene = new Scene(root, 300, 510);
+        primaryStage.setTitle(WINDOW_TITLE);
+        Scene scene = new Scene(root, START_SCENE_WIDTH, START_SCENE_HEIGHT);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();

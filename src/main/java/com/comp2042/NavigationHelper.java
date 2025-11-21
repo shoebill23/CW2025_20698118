@@ -9,13 +9,15 @@ import java.io.IOException;
 import java.net.URL;
 
 public class NavigationHelper {
-    
-    private static final int START_SCENE_WIDTH = 300;
-    private static final int START_SCENE_HEIGHT = 510;
-    
+
+    //Constants
+    private static final int START_SCENE_WIDTH = 600;
+    private static final int START_SCENE_HEIGHT = 600;
+    private static final String START_LAYOUT_FXML = "startLayout.fxml";
+
     // Navigates to the start menu screen
     public static void navigateToStartMenu(Stage stage) throws IOException {
-        URL location = NavigationHelper.class.getClassLoader().getResource("startLayout.fxml");
+        URL location = NavigationHelper.class.getClassLoader().getResource(START_LAYOUT_FXML);
         if (location == null) {
             System.err.println("Error: Could not find startLayout.fxml resource");
             return;
@@ -32,4 +34,3 @@ public class NavigationHelper {
         stage.show();
     }
 }
-

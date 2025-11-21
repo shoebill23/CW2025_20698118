@@ -7,6 +7,12 @@ import java.net.URL;
 
 public class FontLoader {
     
+    // --- Font Resource ---
+    private static final String FONT_FILE_NAME = "janinosjuosta copy.ttf";
+    
+    // --- Font Loading Size ---
+    private static final double FONT_LOAD_SIZE = 12;
+    
     private static String fontFamilyName = null;
     private static boolean fontLoaded = false;
 
@@ -16,9 +22,9 @@ public class FontLoader {
         }
         
         // Try loading font using InputStream (more reliable)
-        try (java.io.InputStream fontStream = FontLoader.class.getClassLoader().getResourceAsStream("janinosjuosta copy.ttf")) {
+        try (java.io.InputStream fontStream = FontLoader.class.getClassLoader().getResourceAsStream(FONT_FILE_NAME)) {
             if (fontStream != null) {
-                Font loadedFont = Font.loadFont(fontStream, 12);
+                Font loadedFont = Font.loadFont(fontStream, FONT_LOAD_SIZE);
                 if (loadedFont != null) {
                     fontFamilyName = loadedFont.getFamily();
                     fontLoaded = true;
@@ -40,7 +46,7 @@ public class FontLoader {
                     System.err.println("Failed to load font - Font.loadFont returned null");
                 }
             } else {
-                System.err.println("Font resource stream is null - janinosjuosta copy.ttf not found");
+                System.err.println("Font resource stream is null - " + FONT_FILE_NAME + " not found");
             }
         } catch (Exception e) {
             System.err.println("Exception loading font: " + e.getMessage());
@@ -49,9 +55,9 @@ public class FontLoader {
         
         // Fallback: Try URL method
         try {
-            URL fontUrl = FontLoader.class.getClassLoader().getResource("janinosjuosta copy.ttf");
+            URL fontUrl = FontLoader.class.getClassLoader().getResource(FONT_FILE_NAME);
             if (fontUrl != null) {
-                Font loadedFont = Font.loadFont(fontUrl.toExternalForm(), 12);
+                Font loadedFont = Font.loadFont(fontUrl.toExternalForm(), FONT_LOAD_SIZE);
                 if (loadedFont != null) {
                     fontFamilyName = loadedFont.getFamily();
                     fontLoaded = true;
@@ -101,4 +107,3 @@ public class FontLoader {
         return fontLoaded && fontFamilyName != null;
     }
 }
-

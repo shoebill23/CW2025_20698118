@@ -9,7 +9,10 @@ import java.util.List;
 
 public class HighScoreManager {
     
+    //Constants
     private static final String HIGH_SCORE_FILE = "highscores.csv";
+    private static final String CSV_HEADER = "Score\n";
+    private static final int DEFAULT_HIGH_SCORE = 0;
     
 
     public static void saveScore(int score) {
@@ -21,7 +24,7 @@ public class HighScoreManager {
             try (FileWriter writer = new FileWriter(HIGH_SCORE_FILE, true)) {
                 if (!fileExists) {
                     // Write header if file doesn't exist
-                    writer.append("Score\n");
+                    writer.append(CSV_HEADER);
                 }
                 writer.append(String.valueOf(score)).append("\n");
             }
@@ -36,7 +39,7 @@ public class HighScoreManager {
         try {
             Path filePath = Paths.get(HIGH_SCORE_FILE);
             if (!Files.exists(filePath)) {
-                return 0; // No scores yet
+                return DEFAULT_HIGH_SCORE; // No scores yet
             }
             
             List<Integer> scores = new ArrayList<>();
@@ -58,12 +61,12 @@ public class HighScoreManager {
                 }
             }
             
-            // Return the highest score, or 0 if no scores
-            return scores.stream().mapToInt(Integer::intValue).max().orElse(0);
+            // Return the highest score, or default if no scores
+            return scores.stream().mapToInt(Integer::intValue).max().orElse(DEFAULT_HIGH_SCORE);
         } catch (IOException e) {
             System.err.println("Error reading high score from CSV: " + e.getMessage());
             e.printStackTrace();
-            return 0;
+            return DEFAULT_HIGH_SCORE;
         }
     }
 }

@@ -10,6 +10,10 @@ import java.io.IOException;
 
 public class GameOverMenuController {
 
+    //Constants
+    private static final double FONT_SIZE_GAME_OVER_TITLE = 28;
+    private static final double FONT_SIZE_MENU_BUTTON = 16;
+
     private GuiController guiController;
     
     @FXML
@@ -31,13 +35,13 @@ public class GameOverMenuController {
         String fontFamily = FontLoader.loadFont();
         if (fontFamily != null) {
             if (gameOverLabel != null) {
-                gameOverLabel.setFont(FontLoader.getFont(28));
+                gameOverLabel.setFont(FontLoader.getFont(FONT_SIZE_GAME_OVER_TITLE));
             }
             if (retryButton != null) {
-                retryButton.setFont(FontLoader.getFont(16));
+                retryButton.setFont(FontLoader.getFont(FONT_SIZE_MENU_BUTTON));
             }
             if (quitButton != null) {
-                quitButton.setFont(FontLoader.getFont(16));
+                quitButton.setFont(FontLoader.getFont(FONT_SIZE_MENU_BUTTON));
             }
         }
     }

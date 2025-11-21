@@ -7,6 +7,11 @@ import javafx.scene.control.Label;
 
 public class ControlsMenuController {
 
+    // --- Font Sizes ---
+    private static final double FONT_SIZE_CONTROLS_TITLE = 28;
+    private static final double FONT_SIZE_CONTROL_LABEL = 14;
+    private static final double FONT_SIZE_MENU_BUTTON = 16;
+
     private GuiController guiController;
     
     @FXML
@@ -43,28 +48,28 @@ public class ControlsMenuController {
         String fontFamily = FontLoader.loadFont();
         if (fontFamily != null) {
             if (controlsLabel != null) {
-                controlsLabel.setFont(FontLoader.getFont(28));
+                controlsLabel.setFont(FontLoader.getFont(FONT_SIZE_CONTROLS_TITLE));
             }
             if (escLabel != null) {
-                escLabel.setFont(FontLoader.getFont(14));
+                escLabel.setFont(FontLoader.getFont(FONT_SIZE_CONTROL_LABEL));
             }
             if (spaceLabel != null) {
-                spaceLabel.setFont(FontLoader.getFont(14));
+                spaceLabel.setFont(FontLoader.getFont(FONT_SIZE_CONTROL_LABEL));
             }
             if (downLabel != null) {
-                downLabel.setFont(FontLoader.getFont(14));
+                downLabel.setFont(FontLoader.getFont(FONT_SIZE_CONTROL_LABEL));
             }
             if (leftLabel != null) {
-                leftLabel.setFont(FontLoader.getFont(14));
+                leftLabel.setFont(FontLoader.getFont(FONT_SIZE_CONTROL_LABEL));
             }
             if (rightLabel != null) {
-                rightLabel.setFont(FontLoader.getFont(14));
+                rightLabel.setFont(FontLoader.getFont(FONT_SIZE_CONTROL_LABEL));
             }
             if (upLabel != null) {
-                upLabel.setFont(FontLoader.getFont(14));
+                upLabel.setFont(FontLoader.getFont(FONT_SIZE_CONTROL_LABEL));
             }
             if (backButton != null) {
-                backButton.setFont(FontLoader.getFont(16));
+                backButton.setFont(FontLoader.getFont(FONT_SIZE_MENU_BUTTON));
             }
         }
     }
