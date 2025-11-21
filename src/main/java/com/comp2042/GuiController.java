@@ -14,13 +14,16 @@ import javafx.scene.control.Label;
 import javafx.scene.effect.Reflection;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
-import javafx.scene.text.Font;
 import javafx.util.Duration;
 
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -36,6 +39,9 @@ public class GuiController implements Initializable {
 
     @FXML
     private GridPane brickPanel;
+    
+    @FXML
+    private Group gridLines;
 
     @FXML
     private GridPane nextBrickPanel;
@@ -44,10 +50,37 @@ public class GuiController implements Initializable {
     private GridPane holdBrickPanel;
 
     @FXML
-    private GameOverPanel gameOverPanel;
+    private Group groupPause;
+    
+    @FXML
+    private Group groupGameOver;
+    
+    @FXML
+    private Group groupControls;
+    
+    private GameOverMenuController gameOverMenuController;
+    
+    private ControlsMenuController controlsMenuController;
 
     @FXML
     private Label scoreLabel;
+
+    @FXML
+    private Label holdLabel;
+    
+    @FXML
+    private Label scoreTitleLabel;
+    
+    @FXML
+    private Label highScoreTitleLabel;
+    
+    @FXML
+    private Label highScoreLabel;
+    
+    @FXML
+    private Label nextBrickLabel;
+
+    private PauseMenuController pauseMenuController;
 
     private Rectangle[][] displayMatrix;
 
@@ -56,6 +89,10 @@ public class GuiController implements Initializable {
     private Rectangle[][] rectangles;
     private Rectangle[][] nextBrickRectangles;
     private Rectangle[][] holdBrickRectangles;
+    
+    // Fixed grid size for preview panels (all bricks are 4x4)
+    private static final int PREVIEW_GRID_SIZE = 4;
+    private static final int PREVIEW_BRICK_SIZE = 15;
 
     private Timeline timeLine;
 
@@ -65,7 +102,9 @@ public class GuiController implements Initializable {
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Font.loadFont(getClass().getClassLoader().getResource("digital.ttf").toExternalForm(), 38);
+        // Load font using FontLoader
+        FontLoader.loadFont();
+
         gamePanel.setFocusTraversable(true);
         gamePanel.requestFocus();
         gamePanel.setOnKeyPressed(new EventHandler<KeyEvent>() {
@@ -93,13 +132,50 @@ public class GuiController implements Initializable {
                         refreshBrick(viewData);
                         keyEvent.consume();
                     }
+                    if (keyEvent.getCode() == KeyCode.SPACE) {
+                        hardDrop();
+                        keyEvent.consume();
+                    }
                 }
-                if (keyEvent.getCode() == KeyCode.N) {
-                    newGame(null);
+                // ESC key works both when paused and unpaused
+                if (keyEvent.getCode() == KeyCode.ESCAPE) {
+                    togglePause();
+                    keyEvent.consume();
                 }
             }
         });
-        gameOverPanel.setVisible(false);
+        if (groupGameOver != null) {
+            groupGameOver.setVisible(false);
+        }
+        if (groupPause != null) {
+            groupPause.setVisible(false);
+        }
+        if (groupControls != null) {
+            groupControls.setVisible(false);
+        }
+        
+        // Load pause menu manually to avoid fx:include issues
+        loadPauseMenu();
+        
+        // Load game over menu manually
+        loadGameOverMenu();
+        
+        // Load controls menu manually
+        loadControlsMenu();
+        
+        // Initialize high score display
+        updateHighScoreDisplay();
+        
+        // Apply fonts to high score labels
+        String fontFamily = FontLoader.loadFont();
+        if (fontFamily != null) {
+            if (highScoreTitleLabel != null) {
+                highScoreTitleLabel.setFont(FontLoader.getFont(20));
+            }
+            if (highScoreLabel != null) {
+                highScoreLabel.setFont(FontLoader.getFont(24));
+            }
+        }
 
         final Reflection reflection = new Reflection();
         reflection.setFraction(0.8);
@@ -117,6 +193,9 @@ public class GuiController implements Initializable {
                 gamePanel.add(rectangle, j, i - 2);
             }
         }
+        
+        // Create white grid lines
+        createGridLines(boardMatrix[0].length, boardMatrix.length - 2);
 
         rectangles = new Rectangle[brick.getBrickData().length][brick.getBrickData()[0].length];
         for (int i = 0; i < brick.getBrickData().length; i++) {
@@ -131,6 +210,9 @@ public class GuiController implements Initializable {
         brickPanel.setLayoutY(-42 + gamePanel.getLayoutY() + brick.getyPosition() * brickPanel.getHgap() + brick.getyPosition() * BRICK_SIZE);
 
         updateNextBrick(brick.getNextBrickData());
+        
+        // Initialize hold brick panel grid even if no brick is held
+        initializeHoldBrickGrid();
 
         timeLine = new Timeline(new KeyFrame(
                 Duration.millis(400),
@@ -140,6 +222,47 @@ public class GuiController implements Initializable {
         timeLine.play();
     }
 
+   
+    private void createGridLines(int columns, int visibleRows) {
+        if (gridLines == null) {
+            return;
+        }
+        
+        gridLines.getChildren().clear();
+        
+        
+        final double HGAP = 1.0;
+        final double VGAP = 1.0;
+        
+        
+        double cellSpacingX = BRICK_SIZE + HGAP;
+        double cellSpacingY = BRICK_SIZE + VGAP;
+        
+        double totalWidth = columns * BRICK_SIZE + (columns - 1) * HGAP;
+        double totalHeight = visibleRows * BRICK_SIZE + (visibleRows - 1) * VGAP;
+        
+        
+        final double STROKE_EXTENSION = 0.5;
+        
+
+        for (int i = 0; i <= columns; i++) {
+            double x = i * cellSpacingX;
+            Line verticalLine = new Line(x, -STROKE_EXTENSION, x, totalHeight + STROKE_EXTENSION);
+            verticalLine.setStroke(Color.WHITE);
+            verticalLine.setStrokeWidth(0.5);
+            gridLines.getChildren().add(verticalLine);
+        }
+        
+
+        for (int i = 0; i <= visibleRows; i++) {
+            double y = i * cellSpacingY;
+            Line horizontalLine = new Line(-STROKE_EXTENSION, y, totalWidth + STROKE_EXTENSION, y);
+            horizontalLine.setStroke(Color.WHITE);
+            horizontalLine.setStrokeWidth(0.5);
+            gridLines.getChildren().add(horizontalLine);
+        }
+    }
+    
     private Paint getFillColor(int i) {
         Paint returnPaint;
         switch (i) {
@@ -215,32 +338,246 @@ public class GuiController implements Initializable {
         gamePanel.requestFocus();
     }
 
+    private void hardDrop() {
+        if (isPause.getValue() == Boolean.FALSE) {
+            DownData downData = eventListener.onHardDropEvent();
+            if (downData.getClearRow() != null && downData.getClearRow().getLinesRemoved() > 0) {
+                NotificationPanel notificationPanel = new NotificationPanel("+" + downData.getClearRow().getScoreBonus());
+                groupNotification.getChildren().add(notificationPanel);
+                notificationPanel.showScore(groupNotification.getChildren());
+            }
+            refreshBrick(downData.getViewData());
+        }
+        gamePanel.requestFocus();
+    }
+    
     public void setEventListener(InputEventListener eventListener) {
         this.eventListener = eventListener;
     }
 
+    private IntegerProperty scoreProperty;
+    
     public void bindScore(IntegerProperty integerProperty) {
+        this.scoreProperty = integerProperty;
         scoreLabel.textProperty().bind(integerProperty.asString());
+    }
+    
+
+    private void updateHighScoreDisplay() {
+        int highScore = HighScoreManager.getHighScore();
+        if (highScoreLabel != null) {
+            highScoreLabel.setText(String.valueOf(highScore));
+        }
     }
 
     public void gameOver() {
         timeLine.stop();
-        gameOverPanel.setVisible(true);
+        System.out.println("gameOver() called");
+        
+
+        if (scoreProperty != null) {
+            int currentScore = scoreProperty.get();
+            HighScoreManager.saveScore(currentScore);
+            System.out.println("Score saved: " + currentScore);
+
+
+            updateHighScoreDisplay();
+        }
+        
+        if (groupGameOver != null) {
+            groupGameOver.setVisible(true);
+            groupGameOver.toFront();
+            System.out.println("groupGameOver.setVisible(true) - visible: " + groupGameOver.isVisible());
+        } else {
+            System.err.println("ERROR: groupGameOver is null!");
+        }
+        
         isGameOver.setValue(Boolean.TRUE);
     }
 
     public void newGame(ActionEvent actionEvent) {
         timeLine.stop();
-        gameOverPanel.setVisible(false);
+        if (groupGameOver != null) {
+            groupGameOver.setVisible(false);
+        }
+        if (groupPause != null) {
+            groupPause.setVisible(false);
+        }
         eventListener.createNewGame();
+
+
+        updateHighScoreDisplay();
         gamePanel.requestFocus();
         timeLine.play();
         isPause.setValue(Boolean.FALSE);
         isGameOver.setValue(Boolean.FALSE);
     }
 
+    public void quitToMainMenu() {
+        try {
+
+
+            if (timeLine != null) {
+                timeLine.stop();
+            }
+            Parent mainMenuRoot = javafx.fxml.FXMLLoader.load(getClass().getResource("/mainMenu.fxml"));
+            Scene scene = gamePanel.getScene();
+            scene.setRoot(mainMenuRoot);
+        } catch (IOException e) {
+            System.err.println("Failed to load mainMenu.fxml");
+            e.printStackTrace();
+        }
+    }
+
     public void pauseGame(ActionEvent actionEvent) {
+        togglePause();
+    }
+
+    private void loadPauseMenu() {
+        if (groupPause == null) {
+            System.err.println("ERROR: groupPause is null! Cannot load pause menu.");
+            return;
+        }
+        
+        try {
+            URL pauseMenuLocation = getClass().getClassLoader().getResource("pauseMenu.fxml");
+            if (pauseMenuLocation == null) {
+                System.err.println("Error: Could not find pauseMenu.fxml resource");
+                return;
+            }
+            
+            javafx.fxml.FXMLLoader pauseMenuLoader = new javafx.fxml.FXMLLoader(pauseMenuLocation);
+            javafx.scene.Parent pauseMenuRoot = pauseMenuLoader.load();
+            pauseMenuController = pauseMenuLoader.getController();
+            
+            if (pauseMenuController != null) {
+                pauseMenuController.setGuiController(this);
+                groupPause.getChildren().clear(); // Clear previous content if any
+                groupPause.getChildren().add(pauseMenuRoot);
+                System.out.println("Pause menu loaded successfully into groupPause");
+            } else {
+                System.err.println("Warning: Pause menu controller is null after loading");
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading pause menu: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    private void loadGameOverMenu() {
+        if (groupGameOver == null) {
+            System.err.println("ERROR: groupGameOver is null! Cannot load game over menu.");
+            return;
+        }
+        
+        try {
+            URL gameOverMenuLocation = getClass().getClassLoader().getResource("gameOverMenu.fxml");
+            if (gameOverMenuLocation == null) {
+                System.err.println("Error: Could not find gameOverMenu.fxml resource");
+                return;
+            }
+            
+            javafx.fxml.FXMLLoader gameOverMenuLoader = new javafx.fxml.FXMLLoader(gameOverMenuLocation);
+            javafx.scene.Parent gameOverMenuRoot = gameOverMenuLoader.load();
+            gameOverMenuController = gameOverMenuLoader.getController();
+            
+            if (gameOverMenuController != null) {
+                gameOverMenuController.setGuiController(this);
+                groupGameOver.getChildren().clear(); 
+                groupGameOver.getChildren().add(gameOverMenuRoot);
+                System.out.println("Game over menu loaded successfully into groupGameOver");
+            } else {
+                System.err.println("Warning: Game over menu controller is null after loading");
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading game over menu: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    private void loadControlsMenu() {
+        if (groupControls == null) {
+            System.err.println("ERROR: groupControls is null! Cannot load controls menu.");
+            return;
+        }
+        
+        try {
+            URL controlsMenuLocation = getClass().getClassLoader().getResource("controlsMenu.fxml");
+            if (controlsMenuLocation == null) {
+                System.err.println("Error: Could not find controlsMenu.fxml resource");
+                return;
+            }
+            
+            javafx.fxml.FXMLLoader controlsMenuLoader = new javafx.fxml.FXMLLoader(controlsMenuLocation);
+            javafx.scene.Parent controlsMenuRoot = controlsMenuLoader.load();
+            controlsMenuController = controlsMenuLoader.getController();
+            
+            if (controlsMenuController != null) {
+                controlsMenuController.setGuiController(this);
+                groupControls.getChildren().clear(); 
+                groupControls.getChildren().add(controlsMenuRoot);
+                System.out.println("Controls menu loaded successfully into groupControls");
+            } else {
+                System.err.println("Warning: Controls menu controller is null after loading");
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading controls menu: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+    
+    private void togglePause() {
+        if (isGameOver.getValue() == Boolean.TRUE) {
+            return; 
+        }
+        
+        if (isPause.getValue() == Boolean.FALSE) {
+
+            timeLine.pause();
+            isPause.setValue(Boolean.TRUE);
+            if (groupPause != null) {
+                groupPause.setVisible(true);
+                groupPause.toFront();
+                System.out.println("Pause menu set to visible - visible: " + groupPause.isVisible());
+            } else {
+                System.err.println("ERROR: groupPause is null in togglePause()!");
+            }
+        } else {
+            
+            timeLine.play();
+            isPause.setValue(Boolean.FALSE);
+            if (groupPause != null) {
+                groupPause.setVisible(false);
+                System.out.println("Pause menu set to invisible");
+            }
+        }
         gamePanel.requestFocus();
+    }
+    
+    public void showControlsMenu() {
+        if (groupControls != null) {
+            groupControls.setVisible(true);
+            groupControls.toFront();
+            if (groupPause != null) {
+                groupPause.setVisible(false);
+            }
+            System.out.println("Controls menu set to visible");
+        } else {
+            System.err.println("ERROR: groupControls is null in showControlsMenu()!");
+        }
+    }
+    
+    public void showPauseMenu() {
+        if (groupPause != null) {
+            groupPause.setVisible(true);
+            groupPause.toFront();
+            if (groupControls != null) {
+                groupControls.setVisible(false);
+            }
+            System.out.println("Pause menu set to visible");
+        } else {
+            System.err.println("ERROR: groupPause is null in showPauseMenu()!");
+        }
     }
 
     private void updateNextBrick(int[][] nextBrickData) {
@@ -248,27 +585,61 @@ public class GuiController implements Initializable {
             return;
         }
 
-        final int NEXT_BRICK_SIZE = 15; // Smaller size for preview
-
-        if (nextBrickRectangles == null
-                || nextBrickRectangles.length != nextBrickData.length
-                || nextBrickRectangles[0].length != nextBrickData[0].length) {
+        if (nextBrickRectangles == null) {
             nextBrickPanel.getChildren().clear();
-            nextBrickRectangles = new Rectangle[nextBrickData.length][nextBrickData[0].length];
-            for (int i = 0; i < nextBrickData.length; i++) {
-                for (int j = 0; j < nextBrickData[i].length; j++) {
-                    Rectangle rectangle = new Rectangle(NEXT_BRICK_SIZE, NEXT_BRICK_SIZE);
+            nextBrickRectangles = new Rectangle[PREVIEW_GRID_SIZE][PREVIEW_GRID_SIZE];
+            for (int i = 0; i < PREVIEW_GRID_SIZE; i++) {
+                for (int j = 0; j < PREVIEW_GRID_SIZE; j++) {
+                    Rectangle rectangle = new Rectangle(PREVIEW_BRICK_SIZE, PREVIEW_BRICK_SIZE);
                     rectangle.setFill(Color.TRANSPARENT);
-                    setRectangleData(0, rectangle); // Initialize with transparent
+                    setRectangleData(0, rectangle); 
                     nextBrickRectangles[i][j] = rectangle;
                     nextBrickPanel.add(rectangle, j, i);
                 }
             }
         }
 
+        // Calculate offset to center the brick within the 4x4 grid
+        int[] offset = calculateCenteringOffset(nextBrickData, PREVIEW_GRID_SIZE);
+
+        // Clear all rectangles first
+        for (int i = 0; i < PREVIEW_GRID_SIZE; i++) {
+            for (int j = 0; j < PREVIEW_GRID_SIZE; j++) {
+                setRectangleData(0, nextBrickRectangles[i][j]);
+            }
+        }
+
+        // Place the brick centered within the grid
         for (int i = 0; i < nextBrickData.length; i++) {
             for (int j = 0; j < nextBrickData[i].length; j++) {
-                setRectangleData(nextBrickData[i][j], nextBrickRectangles[i][j]);
+                int targetRow = i + offset[0];
+                int targetCol = j + offset[1];
+                if (targetRow >= 0 && targetRow < PREVIEW_GRID_SIZE && 
+                    targetCol >= 0 && targetCol < PREVIEW_GRID_SIZE) {
+                    setRectangleData(nextBrickData[i][j], nextBrickRectangles[targetRow][targetCol]);
+                }
+            }
+        }
+    }
+    
+    /**
+     * Initializes the hold brick panel grid structure.
+     * This ensures the panel maintains its size even when no brick is held.
+     */
+    private void initializeHoldBrickGrid() {
+        if (holdBrickPanel == null || holdBrickRectangles != null) {
+            return; // Already initialized or panel doesn't exist
+        }
+        
+        holdBrickPanel.getChildren().clear();
+        holdBrickRectangles = new Rectangle[PREVIEW_GRID_SIZE][PREVIEW_GRID_SIZE];
+        for (int i = 0; i < PREVIEW_GRID_SIZE; i++) {
+            for (int j = 0; j < PREVIEW_GRID_SIZE; j++) {
+                Rectangle rectangle = new Rectangle(PREVIEW_BRICK_SIZE, PREVIEW_BRICK_SIZE);
+                rectangle.setFill(Color.TRANSPARENT);
+                setRectangleData(0, rectangle); // Initialize with transparent
+                holdBrickRectangles[i][j] = rectangle;
+                holdBrickPanel.add(rectangle, j, i);
             }
         }
     }
@@ -278,37 +649,73 @@ public class GuiController implements Initializable {
             return;
         }
 
-        final int HOLD_BRICK_SIZE = 15; // Smaller size for preview
-
-        if (holdBrickData == null) {
-            // Clear the hold panel if no brick is held
-            if (holdBrickRectangles != null) {
-                holdBrickPanel.getChildren().clear();
-                holdBrickRectangles = null;
-            }
-            return;
+        // Ensure grid is initialized (even if no brick is held)
+        if (holdBrickRectangles == null) {
+            initializeHoldBrickGrid();
         }
 
-        if (holdBrickRectangles == null
-                || holdBrickRectangles.length != holdBrickData.length
-                || holdBrickRectangles[0].length != holdBrickData[0].length) {
-            holdBrickPanel.getChildren().clear();
-            holdBrickRectangles = new Rectangle[holdBrickData.length][holdBrickData[0].length];
+        // Clear all rectangles first
+        for (int i = 0; i < PREVIEW_GRID_SIZE; i++) {
+            for (int j = 0; j < PREVIEW_GRID_SIZE; j++) {
+                setRectangleData(0, holdBrickRectangles[i][j]);
+            }
+        }
+
+        // If there's a brick to display, place it centered within the grid
+        if (holdBrickData != null) {
+            // Calculate offset to center the brick within the 4x4 grid
+            int[] offset = calculateCenteringOffset(holdBrickData, PREVIEW_GRID_SIZE);
+
+            // Place the brick centered within the grid
             for (int i = 0; i < holdBrickData.length; i++) {
                 for (int j = 0; j < holdBrickData[i].length; j++) {
-                    Rectangle rectangle = new Rectangle(HOLD_BRICK_SIZE, HOLD_BRICK_SIZE);
-                    rectangle.setFill(Color.TRANSPARENT);
-                    setRectangleData(0, rectangle); // Initialize with transparent
-                    holdBrickRectangles[i][j] = rectangle;
-                    holdBrickPanel.add(rectangle, j, i);
+                    int targetRow = i + offset[0];
+                    int targetCol = j + offset[1];
+                    if (targetRow >= 0 && targetRow < PREVIEW_GRID_SIZE && 
+                        targetCol >= 0 && targetCol < PREVIEW_GRID_SIZE) {
+                        setRectangleData(holdBrickData[i][j], holdBrickRectangles[targetRow][targetCol]);
+                    }
                 }
             }
         }
+    }
+    
 
-        for (int i = 0; i < holdBrickData.length; i++) {
-            for (int j = 0; j < holdBrickData[i].length; j++) {
-                setRectangleData(holdBrickData[i][j], holdBrickRectangles[i][j]);
+    private int[] calculateCenteringOffset(int[][] brickData, int gridSize) {
+        if (brickData == null || brickData.length == 0 || brickData[0].length == 0) {
+            return new int[]{0, 0};
+        }
+        
+        // Find the bounding box of the actual brick (non-zero values)
+        int minRow = brickData.length;
+        int maxRow = -1;
+        int minCol = brickData[0].length;
+        int maxCol = -1;
+        
+        for (int i = 0; i < brickData.length; i++) {
+            for (int j = 0; j < brickData[i].length; j++) {
+                if (brickData[i][j] != 0) {
+                    minRow = Math.min(minRow, i);
+                    maxRow = Math.max(maxRow, i);
+                    minCol = Math.min(minCol, j);
+                    maxCol = Math.max(maxCol, j);
+                }
             }
         }
+        
+        // If no non-zero values found, return no offset
+        if (maxRow < minRow || maxCol < minCol) {
+            return new int[]{0, 0};
+        }
+        
+        // Calculate the actual dimensions of the brick
+        int actualBrickRows = maxRow - minRow + 1;
+        int actualBrickCols = maxCol - minCol + 1;
+        
+        // Calculate offset to center the bounding box within the grid
+        int rowOffset = (gridSize - actualBrickRows) / 2 - minRow;
+        int colOffset = (gridSize - actualBrickCols) / 2 - minCol;
+        
+        return new int[]{rowOffset, colOffset};
     }
 }
