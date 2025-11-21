@@ -5,17 +5,13 @@ import javafx.animation.Timeline;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Group;
 import javafx.scene.control.Label;
-import javafx.scene.effect.Reflection;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
@@ -23,7 +19,6 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 import javafx.util.Duration;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -65,20 +60,12 @@ public class GuiController implements Initializable {
     @FXML
     private Label scoreLabel;
 
-    @FXML
-    private Label holdLabel;
-    
-    @FXML
-    private Label scoreTitleLabel;
     
     @FXML
     private Label highScoreTitleLabel;
     
     @FXML
     private Label highScoreLabel;
-    
-    @FXML
-    private Label nextBrickLabel;
 
     private PauseMenuController pauseMenuController;
 
@@ -110,21 +97,21 @@ public class GuiController implements Initializable {
         gamePanel.setOnKeyPressed(new EventHandler<KeyEvent>() {
             @Override
             public void handle(KeyEvent keyEvent) {
-                if (isPause.getValue() == Boolean.FALSE && isGameOver.getValue() == Boolean.FALSE) {
+                if (!isPause.get() && !isGameOver.get()) {
                     if (keyEvent.getCode() == KeyCode.LEFT || keyEvent.getCode() == KeyCode.A) {
-                        refreshBrick(eventListener.onLeftEvent(new MoveEvent(EventType.LEFT, EventSource.USER)));
+                        refreshBrick(eventListener.onLeftEvent(new MoveEvent(EventSource.USER)));
                         keyEvent.consume();
                     }
                     if (keyEvent.getCode() == KeyCode.RIGHT || keyEvent.getCode() == KeyCode.D) {
-                        refreshBrick(eventListener.onRightEvent(new MoveEvent(EventType.RIGHT, EventSource.USER)));
+                        refreshBrick(eventListener.onRightEvent(new MoveEvent(EventSource.USER)));
                         keyEvent.consume();
                     }
                     if (keyEvent.getCode() == KeyCode.UP || keyEvent.getCode() == KeyCode.W) {
-                        refreshBrick(eventListener.onRotateEvent(new MoveEvent(EventType.ROTATE, EventSource.USER)));
+                        refreshBrick(eventListener.onRotateEvent(new MoveEvent(EventSource.USER)));
                         keyEvent.consume();
                     }
                     if (keyEvent.getCode() == KeyCode.DOWN || keyEvent.getCode() == KeyCode.S) {
-                        moveDown(new MoveEvent(EventType.DOWN, EventSource.USER));
+                        moveDown(new MoveEvent(EventSource.USER));
                         keyEvent.consume();
                     }
                     if (keyEvent.getCode() == KeyCode.C) {
@@ -176,11 +163,6 @@ public class GuiController implements Initializable {
                 highScoreLabel.setFont(FontLoader.getFont(24));
             }
         }
-
-        final Reflection reflection = new Reflection();
-        reflection.setFraction(0.8);
-        reflection.setTopOpacity(0.9);
-        reflection.setTopOffset(-12);
     }
 
     public void initGameView(int[][] boardMatrix, ViewData brick) {
@@ -216,7 +198,7 @@ public class GuiController implements Initializable {
 
         timeLine = new Timeline(new KeyFrame(
                 Duration.millis(400),
-                ae -> moveDown(new MoveEvent(EventType.DOWN, EventSource.THREAD))
+                ae -> moveDown(new MoveEvent(EventSource.THREAD))
         ));
         timeLine.setCycleCount(Timeline.INDEFINITE);
         timeLine.play();
@@ -328,11 +310,7 @@ public class GuiController implements Initializable {
     private void moveDown(MoveEvent event) {
         if (isPause.getValue() == Boolean.FALSE) {
             DownData downData = eventListener.onDownEvent(event);
-            if (downData.getClearRow() != null && downData.getClearRow().getLinesRemoved() > 0) {
-                NotificationPanel notificationPanel = new NotificationPanel("+" + downData.getClearRow().getScoreBonus());
-                groupNotification.getChildren().add(notificationPanel);
-                notificationPanel.showScore(groupNotification.getChildren());
-            }
+            showScoreNotification(downData.getClearRow());
             refreshBrick(downData.getViewData());
         }
         gamePanel.requestFocus();
@@ -341,14 +319,23 @@ public class GuiController implements Initializable {
     private void hardDrop() {
         if (isPause.getValue() == Boolean.FALSE) {
             DownData downData = eventListener.onHardDropEvent();
-            if (downData.getClearRow() != null && downData.getClearRow().getLinesRemoved() > 0) {
-                NotificationPanel notificationPanel = new NotificationPanel("+" + downData.getClearRow().getScoreBonus());
-                groupNotification.getChildren().add(notificationPanel);
-                notificationPanel.showScore(groupNotification.getChildren());
-            }
+            showScoreNotification(downData.getClearRow());
             refreshBrick(downData.getViewData());
         }
         gamePanel.requestFocus();
+    }
+    
+    /**
+     * Shows a score notification when rows are cleared.
+     * 
+     * @param clearRow The ClearRow object containing score bonus information
+     */
+    private void showScoreNotification(ClearRow clearRow) {
+        if (clearRow != null && clearRow.getLinesRemoved() > 0) {
+            NotificationPanel notificationPanel = new NotificationPanel("+" + clearRow.getScoreBonus());
+            groupNotification.getChildren().add(notificationPanel);
+            notificationPanel.showScore(groupNotification.getChildren());
+        }
     }
     
     public void setEventListener(InputEventListener eventListener) {
@@ -395,7 +382,16 @@ public class GuiController implements Initializable {
         isGameOver.setValue(Boolean.TRUE);
     }
 
-    public void newGame(ActionEvent actionEvent) {
+    public void resumeGame() {
+        timeLine.play();
+        isPause.setValue(Boolean.FALSE);
+        if (groupPause != null) {
+            groupPause.setVisible(false);
+        }
+        gamePanel.requestFocus();
+    }
+
+    public void newGame() {
         timeLine.stop();
         if (groupGameOver != null) {
             groupGameOver.setVisible(false);
@@ -413,25 +409,6 @@ public class GuiController implements Initializable {
         isGameOver.setValue(Boolean.FALSE);
     }
 
-    public void quitToMainMenu() {
-        try {
-
-
-            if (timeLine != null) {
-                timeLine.stop();
-            }
-            Parent mainMenuRoot = javafx.fxml.FXMLLoader.load(getClass().getResource("/mainMenu.fxml"));
-            Scene scene = gamePanel.getScene();
-            scene.setRoot(mainMenuRoot);
-        } catch (IOException e) {
-            System.err.println("Failed to load mainMenu.fxml");
-            e.printStackTrace();
-        }
-    }
-
-    public void pauseGame(ActionEvent actionEvent) {
-        togglePause();
-    }
 
     private void loadPauseMenu() {
         if (groupPause == null) {
@@ -532,18 +509,29 @@ public class GuiController implements Initializable {
         }
         
         if (isPause.getValue() == Boolean.FALSE) {
-
             timeLine.pause();
             isPause.setValue(Boolean.TRUE);
             if (groupPause != null) {
+                // Ensure menu is loaded
+                if (groupPause.getChildren().isEmpty()) {
+                    System.out.println("Warning: Pause menu is empty, reloading...");
+                    loadPauseMenu();
+                }
                 groupPause.setVisible(true);
                 groupPause.toFront();
-                System.out.println("Pause menu set to visible - visible: " + groupPause.isVisible());
+                // Also ensure the parent brings it to front by removing and re-adding
+                javafx.scene.Parent parent = groupPause.getParent();
+                if (parent instanceof javafx.scene.layout.Pane) {
+                    javafx.scene.layout.Pane pane = (javafx.scene.layout.Pane) parent;
+                    pane.getChildren().remove(groupPause);
+                    pane.getChildren().add(groupPause);
+                }
+                System.out.println("Pause menu set to visible - visible: " + groupPause.isVisible() + 
+                                 ", children count: " + groupPause.getChildren().size());
             } else {
                 System.err.println("ERROR: groupPause is null in togglePause()!");
             }
         } else {
-            
             timeLine.play();
             isPause.setValue(Boolean.FALSE);
             if (groupPause != null) {
@@ -622,10 +610,7 @@ public class GuiController implements Initializable {
         }
     }
     
-    /**
-     * Initializes the hold brick panel grid structure.
-     * This ensures the panel maintains its size even when no brick is held.
-     */
+    // Initializes the hold brick panel grid structure.
     private void initializeHoldBrickGrid() {
         if (holdBrickPanel == null || holdBrickRectangles != null) {
             return; // Already initialized or panel doesn't exist

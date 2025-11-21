@@ -6,6 +6,7 @@
       styleClass="menu-overlay">
 
     <Label fx:id="pausedLabel" text="PAUSED" styleClass="menu-title-label"/>
+    <Button fx:id="resumeButton" text="Resume" onAction="#onResumeClicked" styleClass="menu-button"/>
     <Button fx:id="restartButton" text="Restart" onAction="#onRestartClicked" styleClass="menu-button"/>
     <Button fx:id="controlsButton" text="Controls" onAction="#onControlsClicked" styleClass="menu-button"/>
     <Button fx:id="quitButton" text="Quit" onAction="#onQuitClicked" styleClass="menu-button"/>

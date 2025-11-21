@@ -2,15 +2,11 @@ package com.comp2042;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
 import java.io.IOException;
-import java.net.URL;
 
 public class PauseMenuController {
 
@@ -27,6 +23,9 @@ public class PauseMenuController {
     
     @FXML
     private Button quitButton;
+
+    @FXML
+    private Button resumeButton;
 
     public void setGuiController(GuiController guiController) {
         this.guiController = guiController;
@@ -49,13 +48,16 @@ public class PauseMenuController {
             if (quitButton != null) {
                 quitButton.setFont(FontLoader.getFont(16));
             }
+            if (resumeButton != null) {
+                resumeButton.setFont(FontLoader.getFont(16));
+            }
         }
     }
 
     @FXML
     private void onRestartClicked(ActionEvent event) {
         if (guiController != null) {
-            guiController.newGame(event);
+            guiController.newGame();
         }
     }
 
@@ -69,23 +71,13 @@ public class PauseMenuController {
     @FXML
     private void onQuitClicked(ActionEvent event) throws IOException {
         Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
-        
-        // Load the start layout (corrected filename)
-        URL location = getClass().getClassLoader().getResource("startLayout.fxml");
-        if (location == null) {
-            System.err.println("Error: Could not find startLayout.fxml resource");
-            return;
+        NavigationHelper.navigateToStartMenu(stage);
+    }
+
+    @FXML
+    private void onResumeClicked(ActionEvent event) {
+        if (guiController != null) {
+            guiController.resumeGame();
         }
-        
-        FXMLLoader loader = new FXMLLoader(location);
-        Parent root = loader.load();
-        StartController startController = loader.getController();
-        startController.init(stage);
-        
-        // Match the scene size from Main.java
-        Scene scene = new Scene(root, 300, 510);
-        stage.setScene(scene);
-        stage.setResizable(false);
-        stage.show();
     }
 }
