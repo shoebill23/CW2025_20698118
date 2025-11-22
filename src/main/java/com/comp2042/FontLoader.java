@@ -9,7 +9,7 @@ import java.util.logging.Logger;
 public class FontLoader {
 
     // --- Font Resource ---
-    private static final String FONT_FILE_NAME = "janinosjuosta copy.ttf";
+    private static final String FONT_FILE_NAME = "janinosjuosta.ttf";
 
     // --- Font Loading Size ---
     private static final double FONT_LOAD_SIZE = 12;
