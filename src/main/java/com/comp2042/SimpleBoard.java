@@ -182,7 +182,7 @@ public class SimpleBoard implements Board {
     @Override
     public int[][] getHoldBrickData() {
         if (holdBrick == null) {
-            return null;
+            return new int[0][0];
         }
         return holdBrick.getShapeMatrix().get(0); // Return first rotation
     }

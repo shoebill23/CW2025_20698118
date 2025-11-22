@@ -1,15 +1,32 @@
 package com.comp2042;
 
-public final class ClearRow {
+import java.util.Arrays;
+import java.util.Objects;
 
-    private final int linesRemoved;
-    private final int[][] newMatrix;
-    private final int scoreBonus;
+public record ClearRow (int linesRemoved, int[][] newMatrix, int scoreBonus) {
 
-    public ClearRow(int linesRemoved, int[][] newMatrix, int scoreBonus) {
-        this.linesRemoved = linesRemoved;
-        this.newMatrix = newMatrix;
-        this.scoreBonus = scoreBonus;
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof ClearRow(int l, int[][] m, int s)
+                && linesRemoved == l
+                && scoreBonus == s
+                && Arrays.deepEquals(newMatrix, m);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(linesRemoved, scoreBonus);
+        result = 31 * result + Arrays.deepHashCode(newMatrix);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "ClearRow{" +
+                "linesRemoved=" + linesRemoved +
+                ", newMatrix=" + Arrays.deepToString(newMatrix) +
+                ", scoreBonus=" + scoreBonus +
+                '}';
     }
 
     public int getLinesRemoved() {

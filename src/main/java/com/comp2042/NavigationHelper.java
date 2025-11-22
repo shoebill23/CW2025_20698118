@@ -7,6 +7,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.logging.Logger;
 
 public class NavigationHelper {
 
@@ -15,11 +16,18 @@ public class NavigationHelper {
     private static final int START_SCENE_HEIGHT = 600;
     private static final String START_LAYOUT_FXML = "startLayout.fxml";
 
+    //Defining Logger
+    private static final Logger logger = Logger.getLogger(NavigationHelper.class.getName());
+
+    private NavigationHelper(){ //Prevents instantiation of NavigationHelper in other classes
+        throw new IllegalStateException("Utility class");
+    }
+
     // Navigates to the start menu screen
     public static void navigateToStartMenu(Stage stage) throws IOException {
         URL location = NavigationHelper.class.getClassLoader().getResource(START_LAYOUT_FXML);
         if (location == null) {
-            System.err.println("Error: Could not find startLayout.fxml resource");
+            logger.severe("Error: Could not find startLayout.fxml resource");
             return;
         }
         
