@@ -1,68 +1,72 @@
 package com.comp2042;
 
 import javafx.scene.text.Font;
-
+import java.io.InputStream;
 import java.net.URL;
-
+import java.util.logging.Level; // Needed for parameterized logging
+import java.util.logging.Logger;
 
 public class FontLoader {
-    
+
+    // --- Font Resource ---
+    private static final String FONT_FILE_NAME = "janinosjuosta.ttf";
+
+    // --- Font Loading Size ---
+    private static final double FONT_LOAD_SIZE = 12;
+
     private static String fontFamilyName = null;
     private static boolean fontLoaded = false;
+
+    private static final Logger logger = Logger.getLogger(FontLoader.class.getName());
 
     public static String loadFont() {
         if (fontFamilyName != null) {
             return fontFamilyName; // Already loaded
         }
-        
+
         // Try loading font using InputStream (more reliable)
-        try (java.io.InputStream fontStream = FontLoader.class.getClassLoader().getResourceAsStream("janinosjuosta copy.ttf")) {
+        try (InputStream fontStream = FontLoader.class.getClassLoader().getResourceAsStream(FONT_FILE_NAME)) {
             if (fontStream != null) {
-                Font loadedFont = Font.loadFont(fontStream, 12);
+                Font loadedFont = Font.loadFont(fontStream, FONT_LOAD_SIZE);
                 if (loadedFont != null) {
                     fontFamilyName = loadedFont.getFamily();
                     fontLoaded = true;
-                    System.out.println("Font loaded successfully. Family name: '" + fontFamilyName + "'");
-                    // Verify the font is in the available families
-                    boolean isAvailable = javafx.scene.text.Font.getFamilies().contains(fontFamilyName);
-                    System.out.println("Font is available in system: " + isAvailable);
-                    if (!isAvailable) {
-                        System.err.println("Warning: Font loaded but not found in available families!");
-                        System.err.println("Trying to find similar font names...");
-                        for (String family : Font.getFamilies()) {
-                            if (family.toLowerCase().contains("janinos") || family.toLowerCase().contains("juosta")) {
-                                System.out.println("Found similar font: " + family);
-                            }
-                        }
-                    }
+
+                    // Log success using placeholders
+                    logger.log(Level.INFO, "Font loaded successfully. Family name: ''{0}''", fontFamilyName);
+
+                    // Call your Helper to verify system availability
+                    FontHelper.diagnoseFontAvailability(fontFamilyName);
+
                     return fontFamilyName;
                 } else {
-                    System.err.println("Failed to load font - Font.loadFont returned null");
+                    logger.severe("Failed to load font - Font.loadFont returned null");
                 }
             } else {
-                System.err.println("Font resource stream is null - janinosjuosta copy.ttf not found");
+                // Log using placeholders
+                logger.log(Level.SEVERE, "Font resource stream is null - ''{0}'' not found", FONT_FILE_NAME);
             }
         } catch (Exception e) {
-            System.err.println("Exception loading font: " + e.getMessage());
-            e.printStackTrace();
+            // Pass 'e' to the logger to preserve stack trace without using printStackTrace()
+            logger.log(Level.SEVERE, "Exception loading font from stream", e);
         }
-        
+
         // Fallback: Try URL method
         try {
-            URL fontUrl = FontLoader.class.getClassLoader().getResource("janinosjuosta copy.ttf");
+            URL fontUrl = FontLoader.class.getClassLoader().getResource(FONT_FILE_NAME);
             if (fontUrl != null) {
-                Font loadedFont = Font.loadFont(fontUrl.toExternalForm(), 12);
+                Font loadedFont = Font.loadFont(fontUrl.toExternalForm(), FONT_LOAD_SIZE);
                 if (loadedFont != null) {
                     fontFamilyName = loadedFont.getFamily();
                     fontLoaded = true;
-                    System.out.println("Font loaded successfully via URL. Family name: '" + fontFamilyName + "'");
+                    logger.log(Level.INFO, "Font loaded successfully via URL. Family name: ''{0}''", fontFamilyName);
                     return fontFamilyName;
                 }
             }
         } catch (Exception e) {
-            System.err.println("Exception loading font via URL: " + e.getMessage());
+            logger.log(Level.SEVERE, "Exception loading font via URL", e);
         }
-        
+
         return null;
     }
 
@@ -77,28 +81,27 @@ public class FontLoader {
         for (String family : Font.getFamilies()) {
             if (family.toLowerCase().contains("janinos") || family.toLowerCase().contains("juosta")) {
                 fontFamilyName = family;
-                System.out.println("Found font by name matching: " + family);
+                logger.log(Level.INFO, "Found font by name matching: {0}", family);
                 return family;
             }
         }
         return "System"; // Fallback to system font
     }
-    
+
     public static Font getFont(double size) {
         String family = getFontFamily();
-        System.out.println("FontLoader.getFont(" + size + ") - Using family: '" + family + "'");
-        if (family != null && !family.equals("System")) {
+        logger.log(Level.INFO, "FontLoader.getFont({0}) - Using family: ''{1}''", new Object[]{size, family});
+
+        if (!"System".equals(family)) {
             Font font = Font.font(family, size);
-            System.out.println("  - Created font: " + font);
+            logger.log(Level.INFO, "  - Created font: {0}", font);
             return font;
         }
-        System.err.println("  - WARNING: Using default font (family was null or System)");
-        return Font.font(size); // Return default font if custom font not available
+        logger.severe("  - WARNING: Using default font (family was null or System)");
+        return Font.font(size);
     }
-    
 
     public static boolean isFontLoaded() {
         return fontLoaded && fontFamilyName != null;
     }
 }
-

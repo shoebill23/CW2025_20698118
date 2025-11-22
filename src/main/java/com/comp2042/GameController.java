@@ -2,7 +2,13 @@ package com.comp2042;
 
 public class GameController implements InputEventListener {
 
-    private Board board = new SimpleBoard(25, 10);
+    //constants
+    private static final int BOARD_WIDTH = 25;
+    private static final int BOARD_HEIGHT = 10;
+    private static final int SOFT_DROP_SCORE = 1;
+    private static final int HARD_DROP_SCORE_MULTIPLIER = 2;
+
+    private final Board board = new SimpleBoard(BOARD_WIDTH, BOARD_HEIGHT);
 
     private final GuiController viewGuiController;
 
@@ -36,7 +42,7 @@ public class GameController implements InputEventListener {
 
         } else {
             if (event.getEventSource() == EventSource.USER) {
-                board.getScore().add(1);
+                board.getScore().add(SOFT_DROP_SCORE);
             }
         }
         return new DownData(clearRow, board.getViewData());
@@ -82,7 +88,7 @@ public class GameController implements InputEventListener {
         
         
         if (rowsDropped > 0) {
-            int hardDropScore = 2 * rowsDropped;
+            int hardDropScore = HARD_DROP_SCORE_MULTIPLIER * rowsDropped;
             board.getScore().add(hardDropScore);
         }
         
@@ -108,9 +114,5 @@ public class GameController implements InputEventListener {
         
         
         return new DownData(clearRow, board.getViewData());
-    }
-    
-    public Board getBoard() {
-        return board;
     }
 }

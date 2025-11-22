@@ -6,10 +6,20 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 public class Main extends Application {
+
+    //Constants
+    private static final String WINDOW_TITLE = "Tetris";
+    private static final int START_SCENE_WIDTH = 600;
+    private static final int START_SCENE_HEIGHT = 600;
+    private static final String START_LAYOUT_FXML = "startLayout.fxml";
+
+    private static final Logger logger = Logger.getLogger(Main.class.getName());
 
     @Override
     public void init() throws Exception {
@@ -17,21 +27,21 @@ public class Main extends Application {
         // This makes it available throughout the application
         String fontFamily = FontLoader.loadFont();
         if (fontFamily != null) {
-            System.out.println("Font ready for use. Family name: '" + fontFamily + "'");
+            logger.info("Font ready for use. Family name: '" + fontFamily + "'");
         }
     }
 
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        URL location = getClass().getClassLoader().getResource("startLayout.fxml");
+        URL location = getClass().getClassLoader().getResource(START_LAYOUT_FXML);
         ResourceBundle resources = null;
         FXMLLoader fxmlLoader = new FXMLLoader(location, resources);
         Parent root = fxmlLoader.load();
         StartController startController = fxmlLoader.getController();
 
-        primaryStage.setTitle("Tetris");
-        Scene scene = new Scene(root, 300, 510);
+        primaryStage.setTitle(WINDOW_TITLE);
+        Scene scene = new Scene(root, START_SCENE_WIDTH, START_SCENE_HEIGHT);
         primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();

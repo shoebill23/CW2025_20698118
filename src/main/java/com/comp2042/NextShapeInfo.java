@@ -1,13 +1,30 @@
 package com.comp2042;
 
-public final class NextShapeInfo {
+import java.util.Arrays;
+import java.util.Objects;
 
-    private final int[][] shape;
-    private final int position;
+public record NextShapeInfo (int[][] shape, int position) {
 
-    public NextShapeInfo(final int[][] shape, final int position) {
-        this.shape = shape;
-        this.position = position;
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof NextShapeInfo(int[][] s, int p)
+                && this.position == p
+                && Arrays.deepEquals(this.shape, s);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Objects.hash(position);
+        result = 31 * result + Arrays.deepHashCode(shape);
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return "NextShapeInfo{" +
+                "shape=" + Arrays.deepToString(shape) +
+                ", position=" + position +
+                '}';
     }
 
     public int[][] getShape() {

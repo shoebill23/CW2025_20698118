@@ -16,11 +16,10 @@
             </VBox>
         </left>
         <center>
-            <Pane styleClass="gameBoard" prefWidth="250" prefHeight="520" layoutX="20" layoutY="20">
+            <Pane prefWidth="250" prefHeight="520" layoutX="20" layoutY="20">
                 <clip>
                     <Rectangle x="20" y="25" width="210" height="483"/>
                 </clip>
-                <Rectangle x="20" y="25" width="209" height="482" fill="transparent" stroke="white" strokeWidth="1"/>
                 <Group fx:id="gridLines" layoutX="20" layoutY="25"/>
                 <GridPane fx:id="gamePanel" hgap="1" vgap="1" layoutY="25" layoutX="20"/>
                 <GridPane fx:id="brickPanel" vgap="1" hgap="1"/>

@@ -8,6 +8,14 @@ import java.awt.*;
 
 public class SimpleBoard implements Board {
 
+    //Constants
+    private static final int BRICK_START_X = 4;
+    private static final int BRICK_START_Y = 0;
+    private static final int GAME_OVER_ROW = 5;
+    private static final int MOVE_DOWN_DELTA = 1;
+    private static final int MOVE_LEFT_DELTA = -1;
+    private static final int MOVE_RIGHT_DELTA = 1;
+
     private final int width;
     private final int height;
     private final BrickGenerator brickGenerator;
@@ -31,7 +39,7 @@ public class SimpleBoard implements Board {
     public boolean moveBrickDown() {
         int[][] currentMatrix = MatrixOperations.copy(currentGameMatrix);
         Point p = new Point(currentOffset);
-        p.translate(0, 1);
+        p.translate(0, MOVE_DOWN_DELTA);
         boolean conflict = MatrixOperations.intersect(currentMatrix, brickRotator.getCurrentShape(), (int) p.getX(), (int) p.getY());
         if (conflict) {
             return false;
@@ -46,7 +54,7 @@ public class SimpleBoard implements Board {
     public boolean moveBrickLeft() {
         int[][] currentMatrix = MatrixOperations.copy(currentGameMatrix);
         Point p = new Point(currentOffset);
-        p.translate(-1, 0);
+        p.translate(MOVE_LEFT_DELTA, 0);
         boolean conflict = MatrixOperations.intersect(currentMatrix, brickRotator.getCurrentShape(), (int) p.getX(), (int) p.getY());
         if (conflict) {
             return false;
@@ -60,7 +68,7 @@ public class SimpleBoard implements Board {
     public boolean moveBrickRight() {
         int[][] currentMatrix = MatrixOperations.copy(currentGameMatrix);
         Point p = new Point(currentOffset);
-        p.translate(1, 0);
+        p.translate(MOVE_RIGHT_DELTA, 0);
         boolean conflict = MatrixOperations.intersect(currentMatrix, brickRotator.getCurrentShape(), (int) p.getX(), (int) p.getY());
         if (conflict) {
             return false;
@@ -87,15 +95,14 @@ public class SimpleBoard implements Board {
     public boolean createNewBrick() {
         Brick currentBrick = brickGenerator.getBrick();
         brickRotator.setBrick(currentBrick);
-        currentOffset = new Point(4, 0);
+        currentOffset = new Point(BRICK_START_X, BRICK_START_Y);
         return MatrixOperations.intersect(currentGameMatrix, brickRotator.getCurrentShape(), (int) currentOffset.getX(), (int) currentOffset.getY());
     }
     
     @Override
     public boolean isGameOver() {
-        // Check if row 5 (20-block height line) has any blocks
-        // Row 5 is 20 blocks from the bottom (row 24): 24 - 5 + 1 = 20
-        int gameOverRow = 5;
+        // Check if the game over row has any blocks
+        int gameOverRow = GAME_OVER_ROW;
         if (gameOverRow >= currentGameMatrix.length) {
             return false;
         }
@@ -158,14 +165,14 @@ public class SimpleBoard implements Board {
             holdBrick = currentBrick;
             Brick nextBrick = brickGenerator.getBrick();
             brickRotator.setBrick(nextBrick);
-            currentOffset = new Point(4, 0);
+            currentOffset = new Point(BRICK_START_X, BRICK_START_Y);
             canHold = false;
         } else {
             // Swap current brick with hold brick
             Brick temp = holdBrick;
             holdBrick = currentBrick;
             brickRotator.setBrick(temp);
-            currentOffset = new Point(4, 0);
+            currentOffset = new Point(BRICK_START_X, BRICK_START_Y);
             canHold = false;
         }
         
@@ -175,7 +182,7 @@ public class SimpleBoard implements Board {
     @Override
     public int[][] getHoldBrickData() {
         if (holdBrick == null) {
-            return null;
+            return new int[0][0];
         }
         return holdBrick.getShapeMatrix().get(0); // Return first rotation
     }
@@ -196,7 +203,7 @@ public class SimpleBoard implements Board {
         Point p = new Point(currentOffset);
         while (true) {
             Point nextP = new Point(p);
-            nextP.translate(0, 1);
+            nextP.translate(0, MOVE_DOWN_DELTA);
             boolean conflict = MatrixOperations.intersect(currentMatrix, currentShape, (int) nextP.getX(), (int) nextP.getY());
             if (conflict) {
                 break; // The next position is invalid, so the current 'p' is the lowest valid spot.
