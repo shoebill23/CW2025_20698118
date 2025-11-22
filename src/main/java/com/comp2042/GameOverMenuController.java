@@ -38,7 +38,7 @@ public class GameOverMenuController {
     }
 
     @FXML
-    void onRetry(ActionEvent event) {
+    void onRetry() {
         if (guiController != null) {
             guiController.newGame();
         }

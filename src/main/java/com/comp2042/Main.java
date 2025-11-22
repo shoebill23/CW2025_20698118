@@ -6,8 +6,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 
 public class Main extends Application {
 
@@ -17,13 +19,15 @@ public class Main extends Application {
     private static final int START_SCENE_HEIGHT = 600;
     private static final String START_LAYOUT_FXML = "startLayout.fxml";
 
+    private static final Logger logger = Logger.getLogger(Main.class.getName());
+
     @Override
     public void init() throws Exception {
         // Load the font early, before any FXML is loaded
         // This makes it available throughout the application
         String fontFamily = FontLoader.loadFont();
         if (fontFamily != null) {
-            System.out.println("Font ready for use. Family name: '" + fontFamily + "'");
+            logger.info("Font ready for use. Family name: '" + fontFamily + "'");
         }
     }
 

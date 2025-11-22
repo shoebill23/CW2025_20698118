@@ -3,12 +3,12 @@ package com.comp2042;
 public class GameController implements InputEventListener {
 
     //constants
-    private static final int BOARD_HEIGHT = 25;
-    private static final int BOARD_WIDTH = 10;
+    private static final int BOARD_WIDTH = 25;
+    private static final int BOARD_HEIGHT = 10;
     private static final int SOFT_DROP_SCORE = 1;
     private static final int HARD_DROP_SCORE_MULTIPLIER = 2;
 
-    private Board board = new SimpleBoard(BOARD_HEIGHT, BOARD_WIDTH);
+    private final Board board = new SimpleBoard(BOARD_WIDTH, BOARD_HEIGHT);
 
     private final GuiController viewGuiController;
 
@@ -114,9 +114,5 @@ public class GameController implements InputEventListener {
         
         
         return new DownData(clearRow, board.getViewData());
-    }
-    
-    public Board getBoard() {
-        return board;
     }
 }

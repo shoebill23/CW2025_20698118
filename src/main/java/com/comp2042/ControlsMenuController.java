@@ -1,6 +1,6 @@
 package com.comp2042;
 
-import javafx.event.ActionEvent;
+
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
@@ -53,7 +53,7 @@ public class ControlsMenuController {
     }
 
     @FXML
-    private void onBackClicked(ActionEvent event) {
+    private void onBackClicked() {
         if (guiController != null) {
             guiController.showPauseMenu();
         }

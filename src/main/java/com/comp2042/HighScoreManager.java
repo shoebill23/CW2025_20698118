@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class HighScoreManager {
     
@@ -13,7 +14,8 @@ public class HighScoreManager {
     private static final String HIGH_SCORE_FILE = "highscores.csv";
     private static final String CSV_HEADER = "Score\n";
     private static final int DEFAULT_HIGH_SCORE = 0;
-    
+
+    private static final Logger logger = Logger.getLogger(HighScoreManager.class.getName());
 
     public static void saveScore(int score) {
         try {
@@ -29,7 +31,7 @@ public class HighScoreManager {
                 writer.append(String.valueOf(score)).append("\n");
             }
         } catch (IOException e) {
-            System.err.println("Error saving score to CSV: " + e.getMessage());
+            logger.severe("Error saving score to CSV: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -43,30 +45,34 @@ public class HighScoreManager {
             }
             
             List<Integer> scores = new ArrayList<>();
-            try (BufferedReader reader = Files.newBufferedReader(filePath)) {
-                String line;
-                boolean isFirstLine = true;
-                while ((line = reader.readLine()) != null) {
-                    if (isFirstLine) {
-                        isFirstLine = false;
-                        continue; // Skip header
-                    }
-                    try {
-                        int score = Integer.parseInt(line.trim());
-                        scores.add(score);
-                    } catch (NumberFormatException e) {
-                        // Skip invalid lines
-                        System.err.println("Invalid score line: " + line);
-                    }
-                }
-            }
-            
+            csvParse(filePath, scores);
+
             // Return the highest score, or default if no scores
             return scores.stream().mapToInt(Integer::intValue).max().orElse(DEFAULT_HIGH_SCORE);
         } catch (IOException e) {
-            System.err.println("Error reading high score from CSV: " + e.getMessage());
+            logger.severe("Error reading high score from CSV: " + e.getMessage());
             e.printStackTrace();
             return DEFAULT_HIGH_SCORE;
+        }
+    }
+
+    private static void csvParse(Path filePath, List<Integer> scores) throws IOException {
+        try (BufferedReader reader = Files.newBufferedReader(filePath)) {
+            String line;
+            boolean isFirstLine = true;
+            while ((line = reader.readLine()) != null) {
+                if (isFirstLine) {
+                    isFirstLine = false;
+                    continue; // Skip header
+                }
+                try {
+                    int score = Integer.parseInt(line.trim());
+                    scores.add(score);
+                } catch (NumberFormatException _) {
+                    // Skip invalid lines
+                    logger.severe("Invalid score line: " + line);
+                }
+            }
         }
     }
 }
