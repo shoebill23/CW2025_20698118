@@ -37,36 +37,21 @@ public class PauseMenuController {
     
     @FXML
     private void initialize() {
-        // Applying custom font to pause menu elements
-        String fontFamily = FontLoader.loadFont();
-        if (fontFamily != null) {
-            if (pausedLabel != null) {
-                pausedLabel.setFont(FontLoader.getFont(FONT_SIZE_PAUSE_TITLE));
-            }
-            if (restartButton != null) {
-                restartButton.setFont(FontLoader.getFont(FONT_SIZE_MENU_BUTTON));
-            }
-            if (controlsButton != null) {
-                controlsButton.setFont(FontLoader.getFont(FONT_SIZE_MENU_BUTTON));
-            }
-            if (quitButton != null) {
-                quitButton.setFont(FontLoader.getFont(FONT_SIZE_MENU_BUTTON));
-            }
-            if (resumeButton != null) {
-                resumeButton.setFont(FontLoader.getFont(FONT_SIZE_MENU_BUTTON));
-            }
-        }
+        FontLoader.loadFont();
+
+        FontHelper.applyFont(FONT_SIZE_PAUSE_TITLE, pausedLabel);
+        FontHelper.applyFont(FONT_SIZE_MENU_BUTTON, restartButton, controlsButton, quitButton, resumeButton);
     }
 
     @FXML
-    private void onRestartClicked(ActionEvent event) {
+    private void onRestartClicked() {
         if (guiController != null) {
             guiController.newGame();
         }
     }
 
     @FXML
-    private void onControlsClicked(ActionEvent event) {
+    private void onControlsClicked() {
         if (guiController != null) {
             guiController.showControlsMenu();
         }
@@ -79,7 +64,7 @@ public class PauseMenuController {
     }
 
     @FXML
-    private void onResumeClicked(ActionEvent event) {
+    private void onResumeClicked() {
         if (guiController != null) {
             guiController.resumeGame();
         }

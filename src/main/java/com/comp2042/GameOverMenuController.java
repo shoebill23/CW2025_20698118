@@ -31,19 +31,10 @@ public class GameOverMenuController {
     
     @FXML
     private void initialize() {
-        
-        String fontFamily = FontLoader.loadFont();
-        if (fontFamily != null) {
-            if (gameOverLabel != null) {
-                gameOverLabel.setFont(FontLoader.getFont(FONT_SIZE_GAME_OVER_TITLE));
-            }
-            if (retryButton != null) {
-                retryButton.setFont(FontLoader.getFont(FONT_SIZE_MENU_BUTTON));
-            }
-            if (quitButton != null) {
-                quitButton.setFont(FontLoader.getFont(FONT_SIZE_MENU_BUTTON));
-            }
-        }
+        FontLoader.loadFont();
+
+        FontHelper.applyFont(FONT_SIZE_GAME_OVER_TITLE, gameOverLabel);
+        FontHelper.applyFont(FONT_SIZE_MENU_BUTTON, retryButton, quitButton);
     }
 
     @FXML

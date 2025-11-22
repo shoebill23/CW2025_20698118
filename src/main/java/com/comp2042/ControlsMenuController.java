@@ -44,34 +44,12 @@ public class ControlsMenuController {
     
     @FXML
     private void initialize() {
-        // Applying custom font to controls menu elements
-        String fontFamily = FontLoader.loadFont();
-        if (fontFamily != null) {
-            if (controlsLabel != null) {
-                controlsLabel.setFont(FontLoader.getFont(FONT_SIZE_CONTROLS_TITLE));
-            }
-            if (escLabel != null) {
-                escLabel.setFont(FontLoader.getFont(FONT_SIZE_CONTROL_LABEL));
-            }
-            if (spaceLabel != null) {
-                spaceLabel.setFont(FontLoader.getFont(FONT_SIZE_CONTROL_LABEL));
-            }
-            if (downLabel != null) {
-                downLabel.setFont(FontLoader.getFont(FONT_SIZE_CONTROL_LABEL));
-            }
-            if (leftLabel != null) {
-                leftLabel.setFont(FontLoader.getFont(FONT_SIZE_CONTROL_LABEL));
-            }
-            if (rightLabel != null) {
-                rightLabel.setFont(FontLoader.getFont(FONT_SIZE_CONTROL_LABEL));
-            }
-            if (upLabel != null) {
-                upLabel.setFont(FontLoader.getFont(FONT_SIZE_CONTROL_LABEL));
-            }
-            if (backButton != null) {
-                backButton.setFont(FontLoader.getFont(FONT_SIZE_MENU_BUTTON));
-            }
-        }
+
+        FontLoader.loadFont();
+
+        FontHelper.applyFont(FONT_SIZE_CONTROLS_TITLE, controlsLabel);
+        FontHelper.applyFont(FONT_SIZE_CONTROL_LABEL, escLabel, spaceLabel, downLabel, leftLabel, rightLabel, upLabel);
+        FontHelper.applyFont(FONT_SIZE_MENU_BUTTON, backButton);
     }
 
     @FXML
