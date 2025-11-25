@@ -360,16 +360,24 @@ public class GuiController implements Initializable {
         for (int i = 0; i <= cols; i++) {
             double x = i * (UIConstants.BRICK_SIZE + UIConstants.GRID_HGAP);
             Line line = new Line(x, -UIConstants.GRID_STROKE_EXTENSION, x, h + UIConstants.GRID_STROKE_EXTENSION);
-            line.setStroke(Color.WHITE);
+            line.setStroke(Color.web("#D9D9D9"));
             line.setStrokeWidth(UIConstants.GRID_LINE_WIDTH);
             gridLines.getChildren().add(line);
         }
         for (int i = 0; i <= visibleRows; i++) {
             double y = i * (UIConstants.BRICK_SIZE + UIConstants.GRID_VGAP);
             Line line = new Line(-UIConstants.GRID_STROKE_EXTENSION, y, w + UIConstants.GRID_STROKE_EXTENSION, y);
-            line.setStroke(Color.WHITE);
+            line.setStroke(Color.web("#D9D9D9"));
             line.setStrokeWidth(UIConstants.GRID_LINE_WIDTH);
             gridLines.getChildren().add(line);
         }
+        Rectangle border = new Rectangle(-UIConstants.GRID_STROKE_EXTENSION,
+                -UIConstants.GRID_STROKE_EXTENSION,
+                w + 2 * UIConstants.GRID_STROKE_EXTENSION,
+                h + 2 * UIConstants.GRID_STROKE_EXTENSION);
+        border.setFill(Color.TRANSPARENT);
+        border.setStroke(Color.BLACK);
+        border.setStrokeWidth(4);
+        gridLines.getChildren().add(border);
     }
 }

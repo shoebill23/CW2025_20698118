@@ -5,7 +5,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -17,7 +16,6 @@ import java.util.logging.Logger;
 public class StartController {
 
     // Constants
-    private static final double FONT_SIZE_TITLE = 32;
     private static final double FONT_SIZE_PLAY_BUTTON = 20;
     private static final int GAME_SCENE_WIDTH = 600;
     private static final int GAME_SCENE_HEIGHT = 600;
@@ -26,8 +24,7 @@ public class StartController {
     //Defining Logger
     private static final Logger logger = Logger.getLogger(StartController.class.getName());
 
-    @FXML
-    private Text titleText;
+
 
     @FXML
     private Button classicButton;
@@ -45,7 +42,7 @@ public class StartController {
     private void initialize() {
         FontLoader.loadFont();
 
-        FontHelper.applyFont(FONT_SIZE_TITLE, titleText);
+
         FontHelper.applyFont(FONT_SIZE_PLAY_BUTTON, classicButton, timeAttackButton);
     }
 
@@ -80,7 +77,11 @@ public class StartController {
             primaryStage.setResizable(false);
             primaryStage.show();
 
-            Main.playGameMusic();
+            if (timeAttack) {
+                Main.playTimeAttackMusic();
+            } else {
+                Main.playClassicMusic();
+            }
 
             new GameController(guiController);
 

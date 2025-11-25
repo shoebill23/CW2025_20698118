@@ -21,7 +21,8 @@ public class Main extends Application {
     private static final int START_SCENE_HEIGHT = 600;
     private static final String START_LAYOUT_FXML = "startLayout.fxml";
     private static final String START_MENU_MUSIC = "Pokemon_Center.mp3";
-    private static final String GAME_MUSIC = "Battle!_Trainer.mp3";
+    private static final String CLASSIC_MUSIC = "Littleroot_Town.mp3";
+    private static final String TIME_ATTACK_MUSIC = "Battle!_Trainer.mp3";
     private static final double BASE_VOLUME = 0.3;
 
     private static final Logger logger = Logger.getLogger(Main.class.getName());
@@ -81,8 +82,12 @@ public class Main extends Application {
         playMusic(START_MENU_MUSIC);
     }
 
-    public static void playGameMusic() {
-        playMusic(GAME_MUSIC);
+    public static void playClassicMusic() {
+        playMusic(CLASSIC_MUSIC);
+    }
+
+    public static void playTimeAttackMusic() {
+        playMusic(TIME_ATTACK_MUSIC);
     }
 
     public static void setPaused(boolean paused) {

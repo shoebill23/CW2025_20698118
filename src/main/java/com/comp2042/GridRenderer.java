@@ -34,16 +34,12 @@ public class GridRenderer {
     }
 
     public void render(int[][] data) {
-        // 1. Clear grid
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 gridMatrix[i][j].setFill(ColorMapper.getColor(0));
             }
         }
-
         if (data == null) return;
-
-        // 2. Draw new data
         for (int i = 0; i < data.length; i++) {
             for (int j = 0; j < data[i].length; j++) {
                 if (i < rows && j < cols) {
