@@ -18,11 +18,8 @@ import javafx.util.Duration;
 
 import java.net.URL;
 import java.util.ResourceBundle;
-import java.util.logging.Logger;
 
 public class GuiController implements Initializable {
-
-    private static final Logger logger = Logger.getLogger(GuiController.class.getName());
 
     @FXML private GridPane gamePanel;
     @FXML private GridPane brickPanel;
@@ -33,9 +30,12 @@ public class GuiController implements Initializable {
     @FXML private Group groupPause;
     @FXML private Group groupGameOver;
     @FXML private Group groupControls;
+    @FXML private Label levelLabel;
     @FXML private Label scoreLabel;
     @FXML private Label highScoreTitleLabel;
     @FXML private Label highScoreLabel;
+    @FXML private Label timeTitleLabel;
+    @FXML private Label timeLabel;
 
     // Helpers
     private final OverlayManager overlayManager = new OverlayManager();
@@ -47,6 +47,11 @@ public class GuiController implements Initializable {
     private Rectangle[][] activeBrickRects;
     private Timeline timeLine;
     private IntegerProperty scoreProperty;
+    private int level = 1;
+    private int totalLinesCleared = 0;
+    private boolean timeAttackMode = false;
+    private Timeline timeAttackTimeline;
+    private int remainingSeconds;
 
     private final BooleanProperty isPause = new SimpleBooleanProperty();
     private final BooleanProperty isGameOver = new SimpleBooleanProperty();
@@ -108,10 +113,19 @@ public class GuiController implements Initializable {
         holdBrickRenderer.render(null); // Clear hold
 
         // Start Loop
-        timeLine = new Timeline(new KeyFrame(Duration.millis(UIConstants.GAME_TICK_MS),
-                ae -> moveDown(new MoveEvent(EventSource.THREAD))));
-        timeLine.setCycleCount(Animation.INDEFINITE);
-        timeLine.play();
+        level = 1;
+        totalLinesCleared = 0;
+        rebuildTimeline();
+
+        if (timeTitleLabel != null) {
+            timeTitleLabel.setVisible(timeAttackMode);
+        }
+        if (timeLabel != null) {
+            timeLabel.setVisible(timeAttackMode);
+        }
+        if (timeAttackMode) {
+            startTimeAttack();
+        }
     }
 
     void refreshBrick(ViewData brick) {
@@ -151,10 +165,12 @@ public class GuiController implements Initializable {
 
         if (isPause.get()) {
             timeLine.play();
+            if (timeAttackTimeline != null) timeAttackTimeline.play();
             isPause.set(false);
             overlayManager.hide(groupPause);
         } else {
             timeLine.pause();
+            if (timeAttackTimeline != null) timeAttackTimeline.pause();
             isPause.set(true);
             overlayManager.show(groupPause);
         }
@@ -183,15 +199,73 @@ public class GuiController implements Initializable {
             NotificationPanel notificationPanel = new NotificationPanel("+" + clearRow.getScoreBonus());
             groupNotification.getChildren().add(notificationPanel);
             notificationPanel.showScore(groupNotification.getChildren());
+            onLinesCleared(clearRow.getLinesRemoved());
         }
+    }
+
+    private void onLinesCleared(int lines) {
+        totalLinesCleared += lines;
+        int newLevel = (totalLinesCleared / 10) + 1;
+        if (newLevel != level) {
+            level = newLevel;
+            rebuildTimeline();
+        }
+    }
+
+    private Duration getCurrentDropDuration() {
+        double seconds = 0.75 * Math.pow(0.8 - ((level - 1) * 0.010), (level - 1));
+        return Duration.seconds(seconds);
+    }
+
+    private void rebuildTimeline() {
+        boolean shouldPlay = !isPause.get() && !isGameOver.get();
+        if (timeLine != null) {
+            timeLine.stop();
+        }
+        timeLine = new Timeline(new KeyFrame(getCurrentDropDuration(),
+                ae -> moveDown(new MoveEvent(EventSource.THREAD))));
+        timeLine.setCycleCount(Animation.INDEFINITE);
+        if (levelLabel != null) {
+            levelLabel.setText(String.valueOf(level));
+        }
+        if (shouldPlay) {
+            timeLine.play();
+        }
+    }
+
+    public void setTimeAttackMode(boolean timeAttackMode) {
+        this.timeAttackMode = timeAttackMode;
+    }
+
+    private void startTimeAttack() {
+        remainingSeconds = 60;
+        if (timeLabel != null) {
+            timeLabel.setText(String.valueOf(remainingSeconds));
+        }
+        timeAttackTimeline = new Timeline(new KeyFrame(Duration.seconds(1), ae -> {
+            if (!isPause.get() && !isGameOver.get()) {
+                remainingSeconds--;
+                if (timeLabel != null) {
+                    timeLabel.setText(String.valueOf(Math.max(remainingSeconds, 0)));
+                }
+                if (remainingSeconds <= 0) {
+                    gameOver();
+                }
+            }
+        }));
+        timeAttackTimeline.setCycleCount(Animation.INDEFINITE);
+        timeAttackTimeline.play();
     }
 
     // --- Menu Actions ---
 
     public void gameOver() {
         timeLine.stop();
+        if (timeAttackTimeline != null) {
+            timeAttackTimeline.stop();
+        }
         if (scoreProperty != null) {
-            HighScoreManager.saveScore(scoreProperty.get());
+            HighScoreManager.saveScore(scoreProperty.get(), timeAttackMode);
             updateHighScoreDisplay();
         }
         overlayManager.show(groupGameOver);
@@ -199,18 +273,33 @@ public class GuiController implements Initializable {
     }
 
     public void newGame() {
-        timeLine.stop();
+        if (timeLine != null) {
+            timeLine.stop();
+        }
+        if (timeAttackTimeline != null) {
+            timeAttackTimeline.stop();
+        }
         hideAllOverlays();
         eventListener.createNewGame();
         updateHighScoreDisplay();
         gamePanel.requestFocus();
-        timeLine.play();
+        level = 1;
+        totalLinesCleared = 0;
         isPause.set(false);
         isGameOver.set(false);
+        rebuildTimeline();
+        if (timeTitleLabel != null) {
+            timeTitleLabel.setVisible(timeAttackMode);
+        }
+        if (timeLabel != null) {
+            timeLabel.setVisible(timeAttackMode);
+        }
+        if (timeAttackMode) {
+            startTimeAttack();
+        }
     }
 
     public void resumeGame() {
-        // Just reusing togglePause logic to ensure consistent state
         if (isPause.get()) togglePause();
     }
 
@@ -236,7 +325,7 @@ public class GuiController implements Initializable {
 
     private void updateHighScoreDisplay() {
         if (highScoreLabel != null) {
-            highScoreLabel.setText(String.valueOf(HighScoreManager.getHighScore()));
+            highScoreLabel.setText(String.valueOf(HighScoreManager.getHighScore(timeAttackMode)));
         }
     }
 
