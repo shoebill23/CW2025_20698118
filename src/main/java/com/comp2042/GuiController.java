@@ -166,11 +166,13 @@ public class GuiController implements Initializable {
         if (isPause.get()) {
             timeLine.play();
             if (timeAttackTimeline != null) timeAttackTimeline.play();
+            Main.setPaused(false);
             isPause.set(false);
             overlayManager.hide(groupPause);
         } else {
             timeLine.pause();
             if (timeAttackTimeline != null) timeAttackTimeline.pause();
+            Main.setPaused(true);
             isPause.set(true);
             overlayManager.show(groupPause);
         }
@@ -235,6 +237,7 @@ public class GuiController implements Initializable {
 
     public void setTimeAttackMode(boolean timeAttackMode) {
         this.timeAttackMode = timeAttackMode;
+        updateHighScoreDisplay();
     }
 
     private void startTimeAttack() {

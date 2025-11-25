@@ -80,6 +80,8 @@ public class StartController {
             primaryStage.setResizable(false);
             primaryStage.show();
 
+            Main.playGameMusic();
+
             new GameController(guiController);
 
         } catch (Exception e) {
