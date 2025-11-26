@@ -61,6 +61,7 @@ public class GuiController implements Initializable {
         FontLoader.loadFont();
         gamePanel.setFocusTraversable(true);
         gamePanel.requestFocus();
+        setBoardBackgroundOpacity(UIConstants.BOARD_BACKGROUND_OPACITY);
 
         // 1. Initialize Renderers
         nextBrickRenderer = new GridRenderer(nextBrickPanel, UIConstants.PREVIEW_GRID_SIZE, UIConstants.PREVIEW_GRID_SIZE, UIConstants.PREVIEW_BRICK_SIZE);
@@ -316,10 +317,13 @@ public class GuiController implements Initializable {
         overlayManager.hide(groupControls);
     }
 
-    // --- Getters/Setters/Init Helpers ---
-
     public boolean isPaused() { return isPause.get(); }
     public boolean isGameOver() { return isGameOver.get(); }
+
+    public void setBoardBackgroundOpacity(double opacity) {
+        double clamped = Math.max(0.0, Math.min(1.0, opacity));
+        gamePanel.setStyle("-fx-background-color: rgba(0,0,0," + clamped + ");");
+    }
 
     public void bindScore(IntegerProperty integerProperty) {
         this.scoreProperty = integerProperty;
@@ -360,14 +364,14 @@ public class GuiController implements Initializable {
         for (int i = 0; i <= cols; i++) {
             double x = i * (UIConstants.BRICK_SIZE + UIConstants.GRID_HGAP);
             Line line = new Line(x, -UIConstants.GRID_STROKE_EXTENSION, x, h + UIConstants.GRID_STROKE_EXTENSION);
-            line.setStroke(Color.web("#D9D9D9"));
+            line.setStroke(Color.web("#FFFFFF"));
             line.setStrokeWidth(UIConstants.GRID_LINE_WIDTH);
             gridLines.getChildren().add(line);
         }
         for (int i = 0; i <= visibleRows; i++) {
             double y = i * (UIConstants.BRICK_SIZE + UIConstants.GRID_VGAP);
             Line line = new Line(-UIConstants.GRID_STROKE_EXTENSION, y, w + UIConstants.GRID_STROKE_EXTENSION, y);
-            line.setStroke(Color.web("#D9D9D9"));
+            line.setStroke(Color.web("#FFFFFF"));
             line.setStrokeWidth(UIConstants.GRID_LINE_WIDTH);
             gridLines.getChildren().add(line);
         }

@@ -14,6 +14,7 @@ public final class UIConstants {
     public static final double GRID_VGAP = 1.0;
     public static final double GRID_STROKE_EXTENSION = 0.5;
     public static final double GRID_LINE_WIDTH = 1.0;
+    public static final double BOARD_BACKGROUND_OPACITY = 0.75;
     public static final double RECTANGLE_ARC_SIZE = 9;
     public static final double FONT_SIZE_HIGH_SCORE_TITLE = 20;
     public static final double FONT_SIZE_HIGH_SCORE_VALUE = 24;
