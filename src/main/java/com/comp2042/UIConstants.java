@@ -6,7 +6,6 @@ public final class UIConstants {
         // Private constructor to prevent instantiation
     }
 
-    // --- GUI Constants ---
     public static final int BRICK_SIZE = 20;
     public static final int BOARD_OFFSET_ROW = 2;
     public static final int BRICK_PANEL_Y_OFFSET = -42;
@@ -20,12 +19,10 @@ public final class UIConstants {
     public static final double FONT_SIZE_HIGH_SCORE_VALUE = 24;
     public static final int GAME_TICK_MS = 400;
 
-    // --- FXML Files ---
     public static final String PAUSE_MENU_FXML = "pauseMenu.fxml";
     public static final String GAME_OVER_MENU_FXML = "gameOverMenu.fxml";
     public static final String CONTROLS_MENU_FXML = "controlsMenu.fxml";
 
-    // --- Preview Panel ---
     public static final int PREVIEW_GRID_SIZE = 4;
     public static final int PREVIEW_BRICK_SIZE = 15;
 }

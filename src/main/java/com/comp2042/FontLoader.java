@@ -3,15 +3,15 @@ package com.comp2042;
 import javafx.scene.text.Font;
 import java.io.InputStream;
 import java.net.URL;
-import java.util.logging.Level; // Needed for parameterized logging
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class FontLoader {
 
-    // --- Font Resource ---
+    //Font Resource
     private static final String FONT_FILE_NAME = "janinosjuosta.ttf";
 
-    // --- Font Loading Size ---
+    //Sizes
     private static final double FONT_LOAD_SIZE = 12;
 
     private static String fontFamilyName = null;
@@ -19,12 +19,12 @@ public class FontLoader {
 
     private static final Logger logger = Logger.getLogger(FontLoader.class.getName());
 
-    public static String loadFont() {
+    public static String loadFont() { //Loads the font from the resource folder
         if (fontFamilyName != null) {
-            return fontFamilyName; // Already loaded
+            return fontFamilyName;
         }
 
-        // Try loading font using InputStream (more reliable)
+        //Try loading font using InputStream
         try (InputStream fontStream = FontLoader.class.getClassLoader().getResourceAsStream(FONT_FILE_NAME)) {
             if (fontStream != null) {
                 Font loadedFont = Font.loadFont(fontStream, FONT_LOAD_SIZE);
@@ -32,10 +32,10 @@ public class FontLoader {
                     fontFamilyName = loadedFont.getFamily();
                     fontLoaded = true;
 
-                    // Log success using placeholders
+                    //Log success using placeholders
                     logger.log(Level.INFO, "Font loaded successfully. Family name: ''{0}''", fontFamilyName);
 
-                    // Call your Helper to verify system availability
+                    //Diagnose font availability
                     FontHelper.diagnoseFontAvailability(fontFamilyName);
 
                     return fontFamilyName;
@@ -43,15 +43,14 @@ public class FontLoader {
                     logger.severe("Failed to load font - Font.loadFont returned null");
                 }
             } else {
-                // Log using placeholders
+                //Log using placeholders
                 logger.log(Level.SEVERE, "Font resource stream is null - ''{0}'' not found", FONT_FILE_NAME);
             }
         } catch (Exception e) {
-            // Pass 'e' to the logger to preserve stack trace without using printStackTrace()
             logger.log(Level.SEVERE, "Exception loading font from stream", e);
         }
 
-        // Fallback: Try URL method
+        //Try loading font using URL
         try {
             URL fontUrl = FontLoader.class.getClassLoader().getResource(FONT_FILE_NAME);
             if (fontUrl != null) {

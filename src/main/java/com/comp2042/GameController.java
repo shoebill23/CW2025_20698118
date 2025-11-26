@@ -10,9 +10,9 @@ public class GameController implements InputEventListener {
 
     private final Board board = new SimpleBoard(BOARD_WIDTH, BOARD_HEIGHT);
 
-    private final GuiController viewGuiController;
+    private final GameView viewGuiController;
 
-    public GameController(GuiController c) {
+    public GameController(GuiController c) { //Initialize the game controller
         viewGuiController = c;
         board.createNewBrick();
         viewGuiController.setEventListener(this);

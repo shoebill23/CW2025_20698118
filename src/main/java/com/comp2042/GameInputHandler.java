@@ -4,8 +4,8 @@ import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
-public class GameInputHandler implements EventHandler<KeyEvent> {
-    private final GuiController controller;
+public class GameInputHandler implements EventHandler<KeyEvent> { //Handle user input events
+    private final GameInputReceiver controller;
     private final InputEventListener gameLogic;
 
     public GameInputHandler(GuiController controller, InputEventListener gameLogic) {

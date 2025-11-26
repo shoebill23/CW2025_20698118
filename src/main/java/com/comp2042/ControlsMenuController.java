@@ -7,7 +7,7 @@ import javafx.scene.control.Label;
 
 public class ControlsMenuController {
 
-    // --- Font Sizes ---
+    //Font Sizes
     private static final double FONT_SIZE_CONTROLS_TITLE = 28;
     private static final double FONT_SIZE_CONTROL_LABEL = 14;
     private static final double FONT_SIZE_MENU_BUTTON = 16;
@@ -53,10 +53,9 @@ public class ControlsMenuController {
     }
 
     @FXML
-    private void onBackClicked() {
+    private void onBackClicked() { //Takes player to Pause Menu when Back button is clicked
         if (guiController != null) {
             guiController.showPauseMenu();
         }
     }
 }
-

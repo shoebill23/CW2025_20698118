@@ -6,7 +6,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import java.util.logging.Logger;
 
-public class FontHelper {
+public class FontHelper { //Helper class to apply fonts to nodes and diagnose font availability
 
     private static final Logger logger = Logger.getLogger(FontHelper.class.getName());
 
@@ -28,7 +28,7 @@ public class FontHelper {
         }
     }
 
-    public static void diagnoseFontAvailability(String fontFamilyName) {
+    public static void diagnoseFontAvailability(String fontFamilyName) { //Checks if the font is available in the system
         if (fontFamilyName == null) {
             logger.warning("Cannot diagnose font availability, family name is null.");
             return;

@@ -10,7 +10,6 @@ import javafx.scene.media.MediaPlayer;
 
 
 import java.net.URL;
-import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
 public class Main extends Application {
@@ -41,9 +40,12 @@ public class Main extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
 
-        URL location = getClass().getClassLoader().getResource(START_LAYOUT_FXML);
-        ResourceBundle resources = null;
-        FXMLLoader fxmlLoader = new FXMLLoader(location, resources);
+        URL location = Main.class.getClassLoader().getResource(START_LAYOUT_FXML);
+        if (location == null) {
+            logger.severe("Error: Could not find startLayout.fxml resource");
+            throw new IllegalStateException("startLayout.fxml not found on classpath");
+        }
+        FXMLLoader fxmlLoader = new FXMLLoader(location);
         Parent root = fxmlLoader.load();
         StartController startController = fxmlLoader.getController();
 

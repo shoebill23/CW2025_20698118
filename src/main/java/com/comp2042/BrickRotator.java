@@ -2,7 +2,8 @@ package com.comp2042;
 
 import com.comp2042.logic.bricks.Brick;
 
-public class BrickRotator {
+
+public class BrickRotator { //Class that rotates the brick
 
     private Brick brick;
     private int currentShape = 0;

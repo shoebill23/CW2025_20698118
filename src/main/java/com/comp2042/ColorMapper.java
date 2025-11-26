@@ -3,7 +3,7 @@ package com.comp2042;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
-public class ColorMapper {
+public class ColorMapper { // Maps the index of a brick to its color
     public static Paint getColor(int index) {
         return switch (index) {
             case 0 -> Color.TRANSPARENT;

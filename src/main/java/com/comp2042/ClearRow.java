@@ -3,6 +3,13 @@ package com.comp2042;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * A record that represents a cleared row in the game.
+ *
+ * @param linesRemoved the number of lines removed
+ * @param newMatrix the new matrix after the lines are removed
+ * @param scoreBonus the score bonus for removing the lines
+ */
 public record ClearRow (int linesRemoved, int[][] newMatrix, int scoreBonus) {
 
     @Override

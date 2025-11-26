@@ -30,5 +30,5 @@ public interface Board {
     
     int[][] getHoldBrickData();
     
-    int hardDrop(); // Returns the number of rows dropped
+    int hardDrop();
 }

@@ -3,14 +3,14 @@ package com.comp2042;
 import javafx.scene.layout.GridPane;
 import javafx.scene.shape.Rectangle;
 
-public class GridRenderer {
+public class PreviewRenderer {
     private final GridPane targetPane;
     private final int rows;
     private final int cols;
     private final int brickSize;
     private Rectangle[][] gridMatrix;
 
-    public GridRenderer(GridPane targetPane, int rows, int cols, int brickSize) {
+    public PreviewRenderer(GridPane targetPane, int rows, int cols, int brickSize) {
         this.targetPane = targetPane;
         this.rows = rows;
         this.cols = cols;
@@ -24,7 +24,7 @@ public class GridRenderer {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {
                 Rectangle rect = new Rectangle(brickSize, brickSize);
-                rect.setFill(ColorMapper.getColor(0)); // Transparent
+                rect.setFill(ColorMapper.getColor(0));
                 rect.setArcHeight(UIConstants.RECTANGLE_ARC_SIZE);
                 rect.setArcWidth(UIConstants.RECTANGLE_ARC_SIZE);
                 gridMatrix[i][j] = rect;
