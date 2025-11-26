@@ -40,5 +40,6 @@ public class NavigationHelper {
         stage.setScene(scene);
         stage.setResizable(false);
         stage.show();
+        Main.playStartMusic();
     }
 }

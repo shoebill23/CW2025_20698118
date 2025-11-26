@@ -4,75 +4,75 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.logging.Logger;
 
 public class HighScoreManager {
     
-    //Constants
-    private static final String HIGH_SCORE_FILE = "highscores.csv";
-    private static final String CSV_HEADER = "Score\n";
+    private static final String CLASSIC_FILE = "highscore_classic.txt";
+    private static final String TIME_ATTACK_FILE = "highscore_time_attack.txt";
     private static final int DEFAULT_HIGH_SCORE = 0;
 
     private static final Logger logger = Logger.getLogger(HighScoreManager.class.getName());
 
     public static void saveScore(int score) {
+        saveScore(score, false);
+    }
+
+    public static void saveScore(int score, boolean timeAttack) {
         try {
-            Path filePath = Paths.get(HIGH_SCORE_FILE);
-            boolean fileExists = Files.exists(filePath);
-            
-            // Append score to CSV file
-            try (FileWriter writer = new FileWriter(HIGH_SCORE_FILE, true)) {
-                if (!fileExists) {
-                    // Write header if file doesn't exist
-                    writer.append(CSV_HEADER);
-                }
-                writer.append(String.valueOf(score)).append("\n");
+            Path path = getFile(timeAttack);
+            int current = readHighScore(path);
+            if (score > current) {
+                writeHighScore(path, score);
             }
-        } catch (IOException e) {
-            logger.severe("Error saving score to CSV: " + e.getMessage());
-            e.printStackTrace();
+        } catch (Exception e) {
+            logger.severe("Error saving high score: " + e.getMessage());
         }
     }
-    
 
     public static int getHighScore() {
-        try {
-            Path filePath = Paths.get(HIGH_SCORE_FILE);
-            if (!Files.exists(filePath)) {
-                return DEFAULT_HIGH_SCORE; // No scores yet
-            }
-            
-            List<Integer> scores = new ArrayList<>();
-            csvParse(filePath, scores);
+        return getHighScore(false);
+    }
 
-            // Return the highest score, or default if no scores
-            return scores.stream().mapToInt(Integer::intValue).max().orElse(DEFAULT_HIGH_SCORE);
-        } catch (IOException e) {
-            logger.severe("Error reading high score from CSV: " + e.getMessage());
-            e.printStackTrace();
+    public static int getHighScore(boolean timeAttack) {
+        try {
+            Path path = getFile(timeAttack);
+            return readHighScore(path);
+        } catch (Exception e) {
+            logger.severe("Error reading high score: " + e.getMessage());
             return DEFAULT_HIGH_SCORE;
         }
     }
 
-    private static void csvParse(Path filePath, List<Integer> scores) throws IOException {
-        try (BufferedReader reader = Files.newBufferedReader(filePath)) {
-            String line;
-            boolean isFirstLine = true;
-            while ((line = reader.readLine()) != null) {
-                if (isFirstLine) {
-                    isFirstLine = false;
-                    continue; // Skip header
-                }
+    private static Path getFile(boolean timeAttack) {
+        return Paths.get(timeAttack ? TIME_ATTACK_FILE : CLASSIC_FILE);
+    }
+
+    private static int readHighScore(Path path) {
+        try {
+            if (!Files.exists(path)) {
+                return DEFAULT_HIGH_SCORE;
+            }
+            try (BufferedReader reader = Files.newBufferedReader(path)) {
+                String line = reader.readLine();
+                if (line == null) return DEFAULT_HIGH_SCORE;
                 try {
-                    int score = Integer.parseInt(line.trim());
-                    scores.add(score);
+                    return Integer.parseInt(line.trim());
                 } catch (NumberFormatException _) {
-                    // Skip invalid lines
-                    logger.severe("Invalid score line: " + line);
+                    return DEFAULT_HIGH_SCORE;
                 }
             }
+        } catch (IOException e) {
+            logger.severe("IO error reading high score: " + e.getMessage());
+            return DEFAULT_HIGH_SCORE;
+        }
+    }
+
+    private static void writeHighScore(Path path, int score) {
+        try (BufferedWriter writer = Files.newBufferedWriter(path)) {
+            writer.write(String.valueOf(score));
+        } catch (IOException e) {
+            logger.severe("IO error writing high score: " + e.getMessage());
         }
     }
 }
