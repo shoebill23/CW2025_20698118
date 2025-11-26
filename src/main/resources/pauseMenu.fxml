@@ -2,7 +2,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <VBox xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.comp2042.PauseMenuController"
+      fx:controller="com.comp2042.controller.PauseMenuController"
       styleClass="menu-overlay">
 
     <Label fx:id="pausedLabel" text="PAUSED" styleClass="menu-title-label"/>

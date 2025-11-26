@@ -10,7 +10,7 @@
 <?import javafx.scene.text.Text?>
 <?import java.net.URL?>
 
-<BorderPane fx:controller="com.comp2042.StartController"
+<BorderPane fx:controller="com.comp2042.controller.StartController"
             xmlns:fx="http://javafx.com/fxml"
             prefWidth="300" prefHeight="510"
             style="-fx-background-image: url('TETRIS_TITLE.png'); -fx-background-size: cover; -fx-background-position: center center; -fx-background-repeat: no-repeat;">

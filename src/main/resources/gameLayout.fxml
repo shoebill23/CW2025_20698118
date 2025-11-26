@@ -6,7 +6,7 @@
 <?import javafx.scene.text.Text?>
 <?import javafx.scene.shape.Rectangle?>
 <?import java.net.URL?>
-<Pane fx:controller="com.comp2042.GuiController"
+<Pane fx:controller="com.comp2042.controller.GuiController"
       xmlns:fx="http://javafx.com/fxml">
     <BorderPane fx:id="gameBoard">
         <left>
