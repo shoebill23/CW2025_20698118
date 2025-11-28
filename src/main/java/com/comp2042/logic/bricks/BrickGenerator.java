@@ -5,6 +5,4 @@ public interface BrickGenerator {
     Brick getBrick();
 
     Brick getNextBrick();
-
-    default void reset() { }
 }

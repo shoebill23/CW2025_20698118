@@ -20,10 +20,6 @@
       mvnw.cmd clean javafx:run
       ```
 
-- Notes
-  - Resources (FXML, CSS, images, audio, fonts) are under `src/main/com/comp2042/resources`
-  - `pom.xml` is configured to load resources from `src/main/com/comp2042/resources` and use the JavaFX Maven plugin
-  - No manual module-path flags are necessary when running via Maven
 
 ## Implemented and Working Properly
 
@@ -37,7 +33,7 @@
   - Time Attack plays `Battle!_Trainer.mp3`
   - Pausing reduces music volume to 50%
 
-- Time Attack Mode
+- Time Attack Mode 
   - 60-second countdown with on-screen timer
   - Separate high scores tracked for Classic and Time Attack
 
@@ -67,8 +63,7 @@
 
 - Centering the Bricks within the preview panels
   - Was supposed to ensure the preview bricks were centered in the preview panels
-  - However, the implementation did not account for the different sizes of the preview panels. I tried multiple approaches to center the bricks, but none worked as expected.
-  - The method I used was to compute the smallest box that contains the preview piece, then shift it so that box sits in the middle of the 4×4 preview grid but ended up not working as expected.
+  - The method I used was to compute the smallest box that contains the preview piece, then shift it so that box sits in the middle of the preview grid but ended up not working as expected.
   - The bricks were instead aligned to the top-left corner of the preview panels
 
 - Ghost Brick
@@ -97,7 +92,7 @@ These are files that handle the game logic and presentation which were extracted
   - Location: `src/main/java/com/comp2042/render/GameBoardRenderer.java`
 
 - PreviewRenderer.java
-  - Renders the 4×4 `Hold` and `Next` preview grids
+  - Renders the `Hold` and `Next` preview grids
   - Location: `src/main/java/com/comp2042/render/PreviewRenderer.java`
 
 ### View Abstractions
@@ -196,7 +191,7 @@ These following classes handle specific jobs.
 
 - Main.java
   - Removed direct scene setup and font loading logic 
-  - Delegates initialization to StartController.java and FontLoader.java
+  - Delegates game scene initialization to StartController.java and font loading to FontLoader.java
   - Location: `src/main/java/com/comp2042/main/Main.java`
 
 - SimpleBoard.java
@@ -230,8 +225,8 @@ These following classes handle specific jobs.
 - Font Loading Issues:
   - The font would not load from the resources folder even though it was specified in the `window_styles.css`
   - Solution:
-    - Introduced a separate class to load the font programatically (FontLoader.java)
-    - Added a Helper class (FontHelper.java) to apply the font to labels and text nodes
+    - Introduced a separate Java class (FontLoader.java) to load the font programatically into the necessary files
+    - Added a Helper class (FontHelper.java) to apply the font to labels and text nodes and to diagnose font availability to keep FontLoader.java's job as just loading the font
 
 - Game Not Restarting as Expected:
   - After changing the brick randomization logic to the 7-Bag system the game would not restart as expected and would instead just crash.

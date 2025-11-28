@@ -83,7 +83,7 @@ public class GameController implements InputEventListener {
     @Override
     public void createNewGame() {
         board.newGame();
-        viewGuiController.initGameView(board.getBoardMatrix(), board.getViewData());
+        viewGuiController.refreshGameBackground(board.getBoardMatrix());
         viewGuiController.updateHoldBrick(board.getHoldBrickData());
     }
     
