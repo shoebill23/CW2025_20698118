@@ -163,6 +163,7 @@ public class SimpleBoard implements Board {
         score.reset();
         holdBrick = null;
         canHold = true;
+        brickGenerator.reset();
         createNewBrick();
     }
     

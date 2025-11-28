@@ -28,6 +28,12 @@ public class RandomBrickGenerator implements BrickGenerator { //Generates the Br
     }
 
     @Override
+    public void reset() {
+        bag.clear();
+        refillBag();
+    }
+
+    @Override
     public Brick getBrick() { 
         if (bag.isEmpty()) refillBag();
         Brick next = bag.poll();
