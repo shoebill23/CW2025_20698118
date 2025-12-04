@@ -11,10 +11,21 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Loads overlay FXMLs into container groups and controls their visibility/z-order.
+ * Injects the main controller into overlay controllers when supported.
+ */
 public class OverlayManager {
     private static final Logger logger = Logger.getLogger(OverlayManager.class.getName());
 
     // Generic loader that assumes the controller has a setGuiController method
+    /**
+     * Load an overlay FXML into the given container and return its controller.
+     * @param container target group to host the overlay root
+     * @param fxmlPath resource path to the FXML
+     * @param mainController main GUI controller to inject when supported
+     * @return loaded controller instance, or null on failure
+     */
     public <T> T loadMenu(Group container, String fxmlPath, GuiController mainController) {
         try {
             URL url = getClass().getClassLoader().getResource(fxmlPath);
@@ -43,6 +54,10 @@ public class OverlayManager {
         }
     }
 
+    /**
+     * Show the overlay group and bring it to front.
+     * @param group overlay container group
+     */
     public void show(Group group) {
         if (group != null) {
             // Ensure parent brings it to front (Fixes "hidden behind board" bugs)
@@ -55,6 +70,10 @@ public class OverlayManager {
         }
     }
 
+    /**
+     * Hide the overlay group.
+     * @param group overlay container group
+     */
     public void hide(Group group) {
         if (group != null) group.setVisible(false);
     }

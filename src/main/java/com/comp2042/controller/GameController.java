@@ -6,6 +6,10 @@ import com.comp2042.model.SimpleBoard;
 import com.comp2042.model.data.*;
 import com.comp2042.render.GameView;
 
+/**
+ * Connects the board model with the UI view: processes input events,
+ * updates score/clears, spawns bricks, and triggers overlays.
+ */
 public class GameController implements InputEventListener {
 
     //constants
@@ -18,6 +22,7 @@ public class GameController implements InputEventListener {
 
     private final GameView viewGuiController;
 
+    /** Initialize controller, create first brick, bind view callbacks and score. */
     public GameController(GuiController c) { //Initialize the game controller
         viewGuiController = c;
         board.createNewBrick();
@@ -28,6 +33,7 @@ public class GameController implements InputEventListener {
     }
 
     @Override
+    /** Soft drop handler: merge/clear/spawn on lock, award soft-drop points for user events. */
     public DownData onDownEvent(MoveEvent event) {
         boolean canMove = board.moveBrickDown();
         ClearRow clearRow = null;
@@ -74,6 +80,7 @@ public class GameController implements InputEventListener {
 
 
     @Override
+    /** Hold current brick and update Hold preview. */
     public ViewData onHoldEvent() {
         ViewData viewData = board.holdBrick();
         viewGuiController.updateHoldBrick(board.getHoldBrickData());
@@ -81,13 +88,15 @@ public class GameController implements InputEventListener {
     }
 
     @Override
+    /** Reset board and reinitialize the view for a fresh game. */
     public void createNewGame() {
         board.newGame();
-        viewGuiController.refreshGameBackground(board.getBoardMatrix());
+        viewGuiController.initGameView(board.getBoardMatrix(), board.getViewData());
         viewGuiController.updateHoldBrick(board.getHoldBrickData());
     }
     
     @Override
+    /** Hard drop: score based on rows dropped, then merge/clear/spawn and refresh. */
     public DownData onHardDropEvent() {
         
         int rowsDropped = board.hardDrop();

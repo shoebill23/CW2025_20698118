@@ -5,6 +5,9 @@ import com.comp2042.model.MatrixOperations;
 import java.util.Arrays;
 import java.util.Objects;
 
+/**
+ * Immutable description of the next rotation state: matrix and rotation index.
+ */
 public record NextShapeInfo (int[][] shape, int position) {
 
     @Override
@@ -29,10 +32,18 @@ public record NextShapeInfo (int[][] shape, int position) {
                 '}';
     }
 
+    /**
+     * Defensive copy of the shape matrix.
+     * @return shape matrix
+     */
     public int[][] getShape() {
         return MatrixOperations.copy(shape);
     }
 
+    /**
+     * Rotation index to apply as the next state.
+     * @return rotation index
+     */
     public int getPosition() {
         return position;
     }

@@ -233,9 +233,8 @@ These following classes handle specific jobs.
   - Solution:
     - Debugged the logic and found the issue 
     - The issue was that the previous restart logic was not working with the new 7-Bag system and would sometimes return a NULL value for the next brick.
-    - Solution:
-      - Added a method to reset the Bag every time the game is restarted within the RandomBrickGenerator.java to ensure there always is a full bag when the game restarts.
-      - Inadvertantly made the randomisation better
+    - Added a method to reset the Bag every time the game is restarted within the RandomBrickGenerator.java to ensure there always is a full bag when the game restarts.
+    - Inadvertantly made the randomisation better
 
 -  The Border for the GameBoard:
   - The border for the game board would not render properly and was not fitting to the size of the grid

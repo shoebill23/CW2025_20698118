@@ -5,7 +5,9 @@ import com.comp2042.model.MatrixOperations;
 import java.util.Arrays;
 import java.util.Objects;
 
-//Using record instead of class since it is immutable by default
+/**
+ * Immutable snapshot of the view state: active brick matrix and position, plus next-preview matrix.
+ */
 public record ViewData (int[][] brickData, int xPosition, int yPosition, int[][] nextBrickData) {
 
     @Override //Checks if the numbers in the array are same
@@ -38,18 +40,22 @@ public record ViewData (int[][] brickData, int xPosition, int yPosition, int[][]
     }
 
 
+    /** Defensive copy of the active brick matrix. */
     public int[][] getBrickData() {
         return MatrixOperations.copy(brickData);
     }
 
+    /** X column offset of the active brick. */
     public int getxPosition() {
         return xPosition;
     }
 
+    /** Y row offset of the active brick. */
     public int getyPosition() {
         return yPosition;
     }
 
+    /** Defensive copy of the next-preview brick matrix. */
     public int[][] getNextBrickData() {
         return MatrixOperations.copy(nextBrickData);
     }

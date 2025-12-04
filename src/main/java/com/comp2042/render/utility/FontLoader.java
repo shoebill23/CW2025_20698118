@@ -6,6 +6,10 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Loads the bundled pixel font and provides access to its family or sized instances.
+ * Falls back to system font when unavailable and logs diagnostics.
+ */
 public class FontLoader {
 
     //Font Resource
@@ -19,6 +23,10 @@ public class FontLoader {
 
     private static final Logger logger = Logger.getLogger(FontLoader.class.getName());
 
+    /**
+     * Load the font resource and return its family name, or null on failure.
+     * @return font family name, or null if not loaded
+     */
     public static String loadFont() { //Loads the font from the resource folder
         if (fontFamilyName != null) {
             return fontFamilyName;
@@ -69,6 +77,10 @@ public class FontLoader {
         return null;
     }
 
+    /**
+     * Get the font family name, attempting to load or find similar names if needed.
+     * @return font family name or "System" fallback
+     */
     public static String getFontFamily() {
         if (fontFamilyName == null) {
             loadFont();
@@ -87,6 +99,11 @@ public class FontLoader {
         return "System"; // Fallback to system font
     }
 
+    /**
+     * Create a Font of the given size using the loaded family, or system fallback.
+     * @param size point size
+     * @return font instance
+     */
     public static Font getFont(double size) {
         String family = getFontFamily();
         logger.log(Level.INFO, "FontLoader.getFont({0}) - Using family: ''{1}''", new Object[]{size, family});
@@ -100,6 +117,10 @@ public class FontLoader {
         return Font.font(size);
     }
 
+    /**
+     * Whether the font has been successfully loaded.
+     * @return true when loaded and family set
+     */
     public static boolean isFontLoaded() {
         return fontLoaded && fontFamilyName != null;
     }

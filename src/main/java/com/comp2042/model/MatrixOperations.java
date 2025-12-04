@@ -8,6 +8,9 @@ import java.util.Deque;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Matrix utilities for collision detection, merging, copying, row clearing, and deep-copy of shape lists.
+ */
 public class MatrixOperations {
 
     //COnstants
@@ -18,6 +21,14 @@ public class MatrixOperations {
 
     }
 
+    /**
+     * Check whether placing the given brick matrix at (x,y) collides with bounds or existing cells.
+     * @param matrix background board matrix
+     * @param brick active brick matrix (rotation)
+     * @param x column offset
+     * @param y row offset
+     * @return true if a collision occurs; false otherwise
+     */
     public static boolean intersect(final int[][] matrix, final int[][] brick, int x, int y) {
         for (int i = 0; i < brick.length; i++) {
             for (int j = 0; j < brick[i].length; j++) {
@@ -39,6 +50,11 @@ public class MatrixOperations {
         return returnValue;
     }
 
+    /**
+     * Create a shallow-row copy of the matrix.
+     * @param original source matrix
+     * @return copied matrix
+     */
     public static int[][] copy(int[][] original) {
         int[][] myInt = new int[original.length][];
         for (int i = 0; i < original.length; i++) {
@@ -50,6 +66,14 @@ public class MatrixOperations {
         return myInt;
     }
 
+    /**
+     * Merge the brick cells into a copy of the background at the given offset.
+     * @param filledFields background matrix
+     * @param brick active brick matrix
+     * @param x column offset
+     * @param y row offset
+     * @return new merged matrix
+     */
     public static int[][] merge(int[][] filledFields, int[][] brick, int x, int y) {
         int[][] copy = copy(filledFields);
         for (int i = 0; i < brick.length; i++) {
@@ -64,6 +88,11 @@ public class MatrixOperations {
         return copy;
     }
 
+    /**
+     * Clear full rows and compact the matrix downward.
+     * @param matrix source matrix
+     * @return result containing count, new matrix, and score bonus
+     */
     public static ClearRow checkRemoving(final int[][] matrix) {
         int[][] tmp = new int[matrix.length][matrix[0].length];
         Deque<int[]> newRows = new ArrayDeque<>();
@@ -96,6 +125,11 @@ public class MatrixOperations {
         return new ClearRow(clearedRows.size(), tmp, scoreBonus);
     }
 
+    /**
+     * Deep copy a list of matrices (e.g., rotation states).
+     * @param list source list
+     * @return copied list
+     */
     public static List<int[][]> deepCopyList(List<int[][]> list){
         return list.stream().map(MatrixOperations::copy).collect(Collectors.toList());
     }

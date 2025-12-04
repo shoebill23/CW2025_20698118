@@ -9,6 +9,10 @@ import com.comp2042.logic.bricks.RandomBrickGenerator;
 
 import java.awt.*;
 
+/**
+ * Board implementation managing active brick state, movement/rotation with wall-kicks,
+ * merging/clearing, hold logic, scoring, and game lifecycle.
+ */
 public class SimpleBoard implements Board {
 
     //Constants
@@ -81,6 +85,10 @@ public class SimpleBoard implements Board {
         }
     }
 
+    /**
+     * Rotate the active brick; if blocked, attempts small horizontal wall-kicks
+     * so rotation can succeed near boundaries.
+     */
     @Override
     public boolean rotateLeftBrick() {
         int[][] currentMatrix = MatrixOperations.copy(currentGameMatrix);
@@ -105,6 +113,7 @@ public class SimpleBoard implements Board {
         return false;
     }
 
+    /** Spawn a new brick at the start position; returns true on immediate collision. */
     @Override
     public boolean createNewBrick() {
         Brick currentBrick = brickGenerator.getBrick();
@@ -135,7 +144,11 @@ public class SimpleBoard implements Board {
 
     @Override
     public ViewData getViewData() {
-        return new ViewData(brickRotator.getCurrentShape(), (int) currentOffset.getX(), (int) currentOffset.getY(), brickGenerator.getNextBrick().getShapeMatrix().get(0));
+        Brick next = brickGenerator.getNextBrick();
+        int[][] nextMatrix = (next != null && next.getShapeMatrix() != null && !next.getShapeMatrix().isEmpty())
+                ? next.getShapeMatrix().get(0)
+                : new int[0][0];
+        return new ViewData(brickRotator.getCurrentShape(), (int) currentOffset.getX(), (int) currentOffset.getY(), nextMatrix);
     }
 
     @Override
@@ -157,17 +170,23 @@ public class SimpleBoard implements Board {
     }
 
 
+    /** Reset background, score, hold, and spawn the first brick; resets generator bag. */
     @Override
     public void newGame() {
         currentGameMatrix = new int[width][height];
         score.reset();
         holdBrick = null;
         canHold = true;
+        brickGenerator.reset();
         createNewBrick();
     }
     
+    /**
+     * Hold the current brick once per placement: first hold takes next; subsequent holds swap.
+     * Returns updated view data.
+     */
     @Override
-    public ViewData holdBrick() {
+    public ViewData holdBrick() { //Source: https://harddrop.com/wiki/Hold_piece
         if (!canHold) {
             return getViewData(); // Can't hold if already held this turn
         }
@@ -201,12 +220,16 @@ public class SimpleBoard implements Board {
         return holdBrick.getShapeMatrix().get(0); // Return first rotation
     }
     
+    /** Allow holding again after a new brick spawns. */
     public void resetCanHold() {
         canHold = true;
     }
     
+    /**
+     * Move to the lowest valid Y by simulating downward steps; returns rows dropped for scoring.
+     */
     @Override
-    public int hardDrop() {
+    public int hardDrop() { //Source: https://stackoverflow.com/questions/16592898/tetris-hard-drop-logic
         int[][] currentMatrix = MatrixOperations.copy(currentGameMatrix);
         int[][] currentShape = brickRotator.getCurrentShape();
         

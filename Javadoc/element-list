@@ -1,0 +1,9 @@
+com.comp2042.controller
+com.comp2042.general_utility
+com.comp2042.input
+com.comp2042.logic.bricks
+com.comp2042.main
+com.comp2042.model
+com.comp2042.model.data
+com.comp2042.render
+com.comp2042.render.utility

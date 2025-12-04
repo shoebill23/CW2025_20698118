@@ -6,6 +6,9 @@ import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import java.util.logging.Logger;
 
+/**
+ * Helper for applying the loaded font to JavaFX nodes and diagnosing availability.
+ */
 public class FontHelper { //Helper class to apply fonts to nodes and diagnose font availability
 
     private static final Logger logger = Logger.getLogger(FontHelper.class.getName());
@@ -14,6 +17,11 @@ public class FontHelper { //Helper class to apply fonts to nodes and diagnose fo
         throw new IllegalStateException("Utility class");
     }
 
+    /**
+     * Apply a sized font to provided labeled/text nodes.
+     * @param size point size
+     * @param nodes labeled/text nodes to update
+     */
     public static void applyFont(double size, Node... nodes) {
         Font font = FontLoader.getFont(size);
         if (font == null) return; // If font is not loaded, program exits gracefully
@@ -28,6 +36,10 @@ public class FontHelper { //Helper class to apply fonts to nodes and diagnose fo
         }
     }
 
+    /**
+     * Log whether the font family is present and list similar names if missing.
+     * @param fontFamilyName loaded font family name
+     */
     public static void diagnoseFontAvailability(String fontFamilyName) { //Checks if the font is available in the system
         if (fontFamilyName == null) {
             logger.warning("Cannot diagnose font availability, family name is null.");

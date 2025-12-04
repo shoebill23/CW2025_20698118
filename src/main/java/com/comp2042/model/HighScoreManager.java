@@ -6,6 +6,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
 
+/**
+ * Persists and retrieves high scores for Classic and Time Attack modes using simple text files.
+ * Overwrites the stored score only when a new score exceeds the current value.
+ */
 public class HighScoreManager {
     
     private static final String CLASSIC_FILE = "highscore_classic.txt";
@@ -14,10 +18,19 @@ public class HighScoreManager {
 
     private static final Logger logger = Logger.getLogger(HighScoreManager.class.getName());
 
+    /**
+     * Save a Classic-mode high score if it beats the stored value.
+     * @param score score to persist
+     */
     public static void saveScore(int score) {
         saveScore(score, false);
     }
 
+    /**
+     * Save a high score for the selected mode if it beats the stored value.
+     * @param score score to persist
+     * @param timeAttack true for Time Attack file, false for Classic
+     */
     public static void saveScore(int score, boolean timeAttack) {
         try {
             Path path = getFile(timeAttack);
@@ -30,10 +43,19 @@ public class HighScoreManager {
         }
     }
 
+    /**
+     * Read the Classic-mode high score, or default when missing.
+     * @return high score value
+     */
     public static int getHighScore() {
         return getHighScore(false);
     }
 
+    /**
+     * Read the high score for the selected mode, or default when missing.
+     * @param timeAttack true for Time Attack file, false for Classic
+     * @return high score value
+     */
     public static int getHighScore(boolean timeAttack) {
         try {
             Path path = getFile(timeAttack);

@@ -31,13 +31,28 @@ public class RandomBrickGenerator implements BrickGenerator { //Generates the Br
     public Brick getBrick() { 
         if (bag.isEmpty()) refillBag();
         Brick next = bag.poll();
+        if (next == null) {
+            refillBag();
+            next = bag.poll();
+        }
         if (bag.isEmpty()) refillBag();
-        return next;
+        return next != null ? next : new OBrick();
     }
 
     @Override
     public Brick getNextBrick() {
         if (bag.isEmpty()) refillBag();
-        return bag.peek();
+        Brick peek = bag.peek();
+        if (peek == null) {
+            refillBag();
+            peek = bag.peek();
+        }
+        return peek != null ? peek : new OBrick();
+    }
+
+    @Override
+    public void reset() {
+        bag.clear();
+        refillBag();
     }
 }

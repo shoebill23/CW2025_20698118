@@ -8,16 +8,28 @@ import javafx.event.EventHandler;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 
+/**
+ * Translates keyboard events into game actions via {@link GameInputReceiver} and {@link InputEventListener}.
+ */
 public class GameInputHandler implements EventHandler<KeyEvent> { //Handle user input events
     private final GameInputReceiver controller;
     private final InputEventListener gameLogic;
 
+    /**
+     * Bind handler to the controller and game logic.
+     * @param controller game view controller to apply actions
+     * @param gameLogic logic API to execute moves/rotations/hold/drop
+     */
     public GameInputHandler(GuiController controller, InputEventListener gameLogic) {
         this.controller = controller;
         this.gameLogic = gameLogic;
     }
 
     @Override
+    /**
+     * Map keys (arrows/WASD/SPACE/C/ESC) to movement, rotation, hold, drop, and pause.
+     * @param event key event
+     */
     public void handle(KeyEvent event) {
         // Always allow ESC to toggle pause
         if (event.getCode() == KeyCode.ESCAPE) {

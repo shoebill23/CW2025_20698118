@@ -11,6 +11,9 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.logging.Logger;
 
+/**
+ * Utility for navigating to the Start Menu scene and wiring its controller.
+ */
 public class NavigationHelper {
 
     //Constants
@@ -26,6 +29,11 @@ public class NavigationHelper {
     }
 
     // Navigates to the start menu screen
+    /**
+     * Load startLayout.fxml, set up the scene on the given stage, and start menu music.
+     * @param stage primary stage to display the start scene
+     * @throws IOException when FXML cannot be loaded
+     */
     public static void navigateToStartMenu(Stage stage) throws IOException {
         URL location = NavigationHelper.class.getClassLoader().getResource(START_LAYOUT_FXML);
         if (location == null) {
