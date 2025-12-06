@@ -14,6 +14,8 @@ import javafx.scene.input.KeyEvent;
 public class GameInputHandler implements EventHandler<KeyEvent> { //Handle user input events
     private final GameInputReceiver controller;
     private final InputEventListener gameLogic;
+    private long lastHardDropTime = 0;
+    private static final long HARD_DROP_COOLDOWN = 500;
 
     /**
      * Bind handler to the controller and game logic.
@@ -66,7 +68,13 @@ public class GameInputHandler implements EventHandler<KeyEvent> { //Handle user 
                 event.consume();
             }
             case SPACE -> {
-                controller.hardDrop();
+                long currentTime = System.currentTimeMillis();
+                //Check if enough time has passed since the last drop
+                if (currentTime - lastHardDropTime > HARD_DROP_COOLDOWN) {
+                    controller.hardDrop();
+                    lastHardDropTime = currentTime; // Reset the timer
+                }
+
                 event.consume();
             }
             default -> {
