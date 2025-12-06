@@ -2,39 +2,57 @@ package com.comp2042.logic.bricks;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
 
-public class RandomBrickGenerator implements BrickGenerator {
+public class RandomBrickGenerator implements BrickGenerator { //Generates the Bricks in random implementing a 7-Bag system. Source: https://harddrop.com/wiki/Random_Generator
 
-    private final List<Brick> brickList;
-
-    private final Deque<Brick> nextBricks = new ArrayDeque<>();
+    private final Deque<Brick> bag = new ArrayDeque<>();
 
     public RandomBrickGenerator() {
-        brickList = new ArrayList<>();
-        brickList.add(new IBrick());
-        brickList.add(new JBrick());
-        brickList.add(new LBrick());
-        brickList.add(new OBrick());
-        brickList.add(new SBrick());
-        brickList.add(new TBrick());
-        brickList.add(new ZBrick());
-        nextBricks.add(brickList.get(ThreadLocalRandom.current().nextInt(brickList.size())));
-        nextBricks.add(brickList.get(ThreadLocalRandom.current().nextInt(brickList.size())));
+        refillBag();
+    }
+
+    private void refillBag() { //Refills the bag with 7 random bricks
+        List<Brick> fresh = new ArrayList<>(7);
+        fresh.add(new IBrick());
+        fresh.add(new JBrick());
+        fresh.add(new LBrick());
+        fresh.add(new OBrick());
+        fresh.add(new SBrick());
+        fresh.add(new TBrick());
+        fresh.add(new ZBrick());
+        Collections.shuffle(fresh);
+        bag.addAll(fresh);
     }
 
     @Override
-    public Brick getBrick() {
-        if (nextBricks.size() <= 1) {
-            nextBricks.add(brickList.get(ThreadLocalRandom.current().nextInt(brickList.size())));
+    public Brick getBrick() { 
+        if (bag.isEmpty()) refillBag();
+        Brick next = bag.poll();
+        if (next == null) {
+            refillBag();
+            next = bag.poll();
         }
-        return nextBricks.poll();
+        if (bag.isEmpty()) refillBag();
+        return next != null ? next : new OBrick();
     }
 
     @Override
     public Brick getNextBrick() {
-        return nextBricks.peek();
+        if (bag.isEmpty()) refillBag();
+        Brick peek = bag.peek();
+        if (peek == null) {
+            refillBag();
+            peek = bag.peek();
+        }
+        return peek != null ? peek : new OBrick();
+    }
+
+    @Override
+    public void reset() {
+        bag.clear();
+        refillBag();
     }
 }

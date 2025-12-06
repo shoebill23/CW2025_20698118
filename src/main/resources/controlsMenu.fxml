@@ -2,7 +2,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <VBox xmlns:fx="http://javafx.com/fxml"
-      fx:controller="com.comp2042.ControlsMenuController"
+      fx:controller="com.comp2042.controller.ControlsMenuController"
       styleClass="menu-overlay, menu-overlay-spacing-small">
 
     <Label fx:id="controlsLabel" text="CONTROLS" styleClass="menu-title-label"/>

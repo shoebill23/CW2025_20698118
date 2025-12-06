@@ -1,15 +1,15 @@
 .root {
-    background-image: url("BlackBackground.jpg");
-    -fx-background-image: url("BlackBackground.jpg");
+    -fx-background-image: url("TETRIS_GAME_BACKGROUND_2.png");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: cover;
+    -fx-background-position: center center;
 }
 
 .nextBrick {
-    border-width: 2px;
-    -fx-border-width: 2px;
-    border-color: whitesmoke;
-    -fx-border-color: whitesmoke;
-    border-radius: 17px;
-    -fx-border-radius: 17px;
+    -fx-border-width: 3px;
+    -fx-border-color: black;
+    -fx-border-radius: 0;
+    -fx-background-color: rgba(0, 0, 0, 0.25);
 }
 
 .nextBrickLabel {
