@@ -23,7 +23,11 @@ import javafx.scene.layout.GridPane;
 import java.net.URL;
 import java.util.ResourceBundle;
 
-public class GuiController implements Initializable, GameView, GameInputReceiver { //Main GUI controller for the game
+/**
+ * JavaFX GUI controller implementing the game's view and input receiver.
+ * Coordinates renderers, overlays, timers, and forwards user input to the logic.
+ */
+public class GuiController implements Initializable, GameView, GameInputReceiver {
 
     @FXML private GridPane gamePanel;
     @FXML private GridPane brickPanel;
@@ -54,8 +58,11 @@ public class GuiController implements Initializable, GameView, GameInputReceiver
     private final BooleanProperty isPause = new SimpleBooleanProperty();
     private final BooleanProperty isGameOver = new SimpleBooleanProperty();
 
+    /**
+     * Initialize UI components, renderers, game loop, time attack manager, and overlay menus.
+     */
     @Override
-    public void initialize(URL location, ResourceBundle resources) { //Sets up UI, renderers, loop, and menus
+    public void initialize(URL location, ResourceBundle resources) {
         FontLoader.loadFont();
         gamePanel.setFocusTraversable(true);
         gamePanel.requestFocus();
@@ -77,13 +84,22 @@ public class GuiController implements Initializable, GameView, GameInputReceiver
         setupFonts();
     }
 
-    public void setEventListener(InputEventListener eventListener) { //Attaches keyboard handler to gamePanel
+    /**
+     * Attach the logic listener and register the keyboard handler on the game panel.
+     * @param eventListener game logic listener
+     */
+    public void setEventListener(InputEventListener eventListener) {
         this.eventListener = eventListener;
         gamePanel.setOnKeyPressed(new GameInputHandler(this, eventListener));
     }
 
+    /**
+     * Build the board and initialize active/preview bricks, then start timers.
+     * @param boardMatrix initial background matrix
+     * @param brick initial active brick view
+     */
     @Override
-    public void initGameView(int[][] boardMatrix, ViewData brick) { //Builds board and initializes active/preview bricks
+    public void initGameView(int[][] boardMatrix, ViewData brick) {
         boardRenderer.initBoard(boardMatrix, boardMatrix[0].length, boardMatrix.length - UIConstants.BOARD_OFFSET_ROW);
         boardRenderer.initActiveBrick(brick);
 
@@ -101,14 +117,21 @@ public class GuiController implements Initializable, GameView, GameInputReceiver
     }
 
 
-    private void onGameTick() { //Tick callback used by GameLoop
+    /**
+     * Callback for the game loop tick; performs a soft drop when active.
+     */
+    private void onGameTick() {
         if (!isPause.get() && !isGameOver.get()) {
             moveDown(new MoveEvent(EventSource.THREAD));
         }
     }
 
+    /**
+     * Perform a soft drop and apply scoring/clear row updates.
+     * @param event move event source
+     */
     @Override
-    public void moveDown(MoveEvent event) { //Soft drop and apply scoring effects
+    public void moveDown(MoveEvent event) {
         if (!isPause.get()) {
             DownData downData = eventListener.onDownEvent(event);
             handleClearRow(downData.getClearRow());
@@ -117,8 +140,11 @@ public class GuiController implements Initializable, GameView, GameInputReceiver
         gamePanel.requestFocus();
     }
 
+    /**
+     * Perform a hard drop to the bottom and refresh the view.
+     */
     @Override
-    public void hardDrop() { //Instant drop to bottom
+    public void hardDrop() {
         if (!isPause.get()) {
             DownData downData = eventListener.onHardDropEvent();
             handleClearRow(downData.getClearRow());
@@ -127,20 +153,32 @@ public class GuiController implements Initializable, GameView, GameInputReceiver
         gamePanel.requestFocus();
     }
 
+    /**
+     * Update active brick visuals and the Next preview.
+     * @param brick updated brick view
+     */
     @Override
-    public void refreshBrick(ViewData brick) { //Updates active brick visuals and next preview
+    public void refreshBrick(ViewData brick) {
         if (!isPause.get()) {
             boardRenderer.refreshBrick(brick);
         }
         nextBrickRenderer.render(brick.getNextBrickData());
     }
 
+    /**
+     * Redraw the background cells from the board matrix.
+     * @param board latest background matrix
+     */
     @Override
-    public void refreshGameBackground(int[][] board) { //Redraws background cells from board matrix
+    public void refreshGameBackground(int[][] board) {
         boardRenderer.refreshBackground(board);
     }
 
-    private void handleClearRow(ClearRow clearRow) { //Shows bonus popup and updates level
+    /**
+     * Show bonus notification and update level on cleared rows.
+     * @param clearRow clear-row result
+     */
+    private void handleClearRow(ClearRow clearRow) {
         if (clearRow != null && clearRow.getLinesRemoved() > 0) {
             NotificationPanel notificationPanel = new NotificationPanel("+" + clearRow.getScoreBonus());
             groupNotification.getChildren().add(notificationPanel);
@@ -152,8 +190,11 @@ public class GuiController implements Initializable, GameView, GameInputReceiver
     }
 
 
+    /**
+     * Toggle pause state, timers, music volume, and overlays.
+     */
     @Override
-    public void togglePause() { //Toggles pause state, timers, music, and overlays
+    public void togglePause() {
         if (isGameOver.get()) return;
 
         if (isPause.get()) {
@@ -172,8 +213,11 @@ public class GuiController implements Initializable, GameView, GameInputReceiver
         gamePanel.requestFocus();
     }
 
+    /**
+     * Stop timers, save score, and show the Game Over overlay.
+     */
     @Override
-    public void gameOver() { //Stops timers, saves score, and shows Game Over
+    public void gameOver() {
         gameLoop.stop();
         timeAttackManager.stop();
 
@@ -185,7 +229,10 @@ public class GuiController implements Initializable, GameView, GameInputReceiver
         isGameOver.set(true);
     }
 
-    public void newGame() { //Resets state and starts a fresh game
+    /**
+     * Reset state and start a fresh game.
+     */
+    public void newGame() {
         gameLoop.stop();
         timeAttackManager.stop();
         hideAllOverlays();
@@ -198,67 +245,112 @@ public class GuiController implements Initializable, GameView, GameInputReceiver
         isGameOver.set(false);
     }
 
-    public void setTimeAttackMode(boolean timeAttackMode) { //Enables/disables Time Attack mode
+    /**
+     * Enable or disable Time Attack mode.
+     * @param timeAttackMode whether Time Attack is enabled
+     */
+    public void setTimeAttackMode(boolean timeAttackMode) {
         timeAttackManager.setEnabled(timeAttackMode);
         updateHighScoreDisplay();
     }
 
 
-    public void resumeGame() { //Resumes game if paused
+    /**
+     * Resume the game if currently paused.
+     */
+    public void resumeGame() {
         if (isPause.get()) togglePause();
     }
 
-    public void showControlsMenu() { //Displays controls overlay
+    /**
+     * Display the controls overlay.
+     */
+    public void showControlsMenu() {
         overlayManager.show(groupControls);
         overlayManager.hide(groupPause);
     }
 
-    public void showPauseMenu() { //Displays pause overlay
+    /**
+     * Display the pause overlay.
+     */
+    public void showPauseMenu() {
         overlayManager.show(groupPause);
         overlayManager.hide(groupControls);
     }
 
+    /**
+     * Whether the game is paused.
+     * @return true if paused
+     */
     @Override
-    public boolean isPaused() { return isPause.get(); } //Exposes paused state to handlers
+    public boolean isPaused() { return isPause.get(); }
 
+    /**
+     * Whether the game is over.
+     * @return true if game over
+     */
     @Override
-    public boolean isGameOver() { return isGameOver.get(); } //Exposes game over state
+    public boolean isGameOver() { return isGameOver.get(); }
 
-    public void setBoardBackgroundOpacity(double opacity) { //Adjusts black backdrop behind gameboard
+    /**
+     * Adjust the dark backdrop opacity behind the game board.
+     * @param opacity value between 0.0 and 1.0
+     */
+    public void setBoardBackgroundOpacity(double opacity) {
         double clamped = Math.max(0.0, Math.min(1.0, opacity));
         gamePanel.setStyle("-fx-background-color: rgba(0,0,0," + clamped + ");");
     }
 
+    /**
+     * Bind the score label to the provided score property.
+     * @param integerProperty score observable
+     */
     @Override
-    public void bindScore(IntegerProperty integerProperty) { //Binds score label to property
+    public void bindScore(IntegerProperty integerProperty) {
         this.scoreProperty = integerProperty;
         scoreLabel.textProperty().bind(integerProperty.asString());
     }
 
+    /**
+     * Update the Hold preview grid.
+     * @param holdBrickData matrix for held brick preview
+     */
     @Override
-    public void updateHoldBrick(int[][] holdBrickData) { //Updates Hold preview grid
+    public void updateHoldBrick(int[][] holdBrickData) {
         holdBrickRenderer.render(holdBrickData);
     }
 
-    private void updateLevelLabel() { //Refreshes level label using GameLoop
+    /**
+     * Refresh the level label using the game loop level.
+     */
+    private void updateLevelLabel() {
         if (levelLabel != null) {
             levelLabel.setText(String.valueOf(gameLoop.getLevel()));
         }
     }
 
-    private void updateHighScoreDisplay() { //Refreshes mode-specific high score label
+    /**
+     * Refresh the high score label for the current mode.
+     */
+    private void updateHighScoreDisplay() {
         if (highScoreLabel != null) {
             highScoreLabel.setText(String.valueOf(HighScoreManager.getHighScore(timeAttackManager.isEnabled())));
         }
     }
 
-    private void hideAllOverlays() { //Hides all overlay groups
+    /**
+     * Hide all overlay groups.
+     */
+    private void hideAllOverlays() {
         overlayManager.hide(groupPause);
         overlayManager.hide(groupGameOver);
         overlayManager.hide(groupControls);
     }
 
-    private void setupFonts() { //Applies custom font to labels
+    /**
+     * Apply custom font to labels if available.
+     */
+    private void setupFonts() {
         String fontFamily = FontLoader.getFontFamily();
         if (fontFamily != null && highScoreTitleLabel != null && highScoreLabel != null) {
             highScoreTitleLabel.setFont(FontLoader.getFont(UIConstants.FONT_SIZE_HIGH_SCORE_TITLE));

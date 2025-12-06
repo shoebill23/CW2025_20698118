@@ -11,6 +11,9 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+/**
+ * Controller for the Pause overlay: restart, controls, quit, and resume.
+ */
 public class PauseMenuController {
 
     //Constants
@@ -34,11 +37,18 @@ public class PauseMenuController {
     @FXML
     private Button resumeButton;
 
+    /**
+     * Inject the main GUI controller.
+     * @param guiController main controller
+     */
     public void setGuiController(GuiController guiController) {
         this.guiController = guiController;
     }
     
     @FXML
+    /**
+     * Initialize fonts for labels and buttons.
+     */
     private void initialize() {
         FontLoader.loadFont();
 
@@ -47,6 +57,9 @@ public class PauseMenuController {
     }
 
     @FXML
+    /**
+     * Restart the game.
+     */
     private void onRestartClicked() {
         if (guiController != null) {
             guiController.newGame();
@@ -54,6 +67,9 @@ public class PauseMenuController {
     }
 
     @FXML
+    /**
+     * Show the controls overlay.
+     */
     private void onControlsClicked() {
         if (guiController != null) {
             guiController.showControlsMenu();
@@ -61,12 +77,20 @@ public class PauseMenuController {
     }
 
     @FXML
+    /**
+     * Quit to the start menu.
+     * @param event action event
+     * @throws IOException when navigation fails
+     */
     private void onQuitClicked(ActionEvent event) throws IOException {
         Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
         NavigationHelper.navigateToStartMenu(stage);
     }
 
     @FXML
+    /**
+     * Resume the game.
+     */
     private void onResumeClicked() {
         if (guiController != null) {
             guiController.resumeGame();

@@ -8,7 +8,11 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Rectangle;
 
-public class GameBoardRenderer { //Class to render the game board and active brick
+/**
+ * Renders the game board background and the active brick on top of it.
+ * Manages grid lines and updates visuals based on board/brick state.
+ */
+public class GameBoardRenderer {
 
     private final GridPane gamePanel;
     private final GridPane brickPanel;
@@ -17,13 +21,25 @@ public class GameBoardRenderer { //Class to render the game board and active bri
     private Rectangle[][] displayMatrix;
     private Rectangle[][] activeBrickRects;
 
+    /**
+     * Create a renderer for the board and active brick.
+     * @param gamePanel grid for background cells
+     * @param brickPanel grid for the active brick
+     * @param gridLines overlay group used to draw grid lines and border
+     */
     public GameBoardRenderer(GridPane gamePanel, GridPane brickPanel, Group gridLines) {
         this.gamePanel = gamePanel;
         this.brickPanel = brickPanel;
         this.gridLines = gridLines;
     }
 
-    public void initBoard(int[][] boardMatrix, int cols, int visibleRows) { //Initialize the game board
+    /**
+     * Initialize the background cell rectangles and draw grid lines.
+     * @param boardMatrix initial board matrix
+     * @param cols number of columns
+     * @param visibleRows number of visible rows
+     */
+    public void initBoard(int[][] boardMatrix, int cols, int visibleRows) {
         gamePanel.getChildren().clear();
         displayMatrix = new Rectangle[boardMatrix.length][boardMatrix[0].length];
 
@@ -35,10 +51,14 @@ public class GameBoardRenderer { //Class to render the game board and active bri
                 gamePanel.add(rect, j, i - UIConstants.BOARD_OFFSET_ROW);
             }
         }
-        drawGridLines(cols, visibleRows); //Make the grid lines visible on the game board
+        drawGridLines(cols, visibleRows);
     }
 
-    public void initActiveBrick(ViewData brick) { //Initialize the active brick
+    /**
+     * Initialize the active brick rectangles and position them.
+     * @param brick active brick view data
+     */
+    public void initActiveBrick(ViewData brick) {
         brickPanel.getChildren().clear();
         activeBrickRects = new Rectangle[brick.getBrickData().length][brick.getBrickData()[0].length];
 
@@ -53,12 +73,20 @@ public class GameBoardRenderer { //Class to render the game board and active bri
         updateBrickPosition(brick);
     }
 
+    /**
+     * Update the active brick panel position based on its offsets.
+     * @param brick active brick view data
+     */
     public void updateBrickPosition(ViewData brick) {
         brickPanel.setLayoutX(gamePanel.getLayoutX() + brick.getxPosition() * brickPanel.getVgap() + brick.getxPosition() * UIConstants.BRICK_SIZE);
         brickPanel.setLayoutY(UIConstants.BRICK_PANEL_Y_OFFSET + gamePanel.getLayoutY() + brick.getyPosition() * brickPanel.getHgap() + brick.getyPosition() * UIConstants.BRICK_SIZE);
     }
 
-    public void refreshBrick(ViewData brick) { //Refresh the active brick so that it is visible on the game board
+    /**
+     * Refresh active brick cells and rounded corners.
+     * @param brick active brick view data
+     */
+    public void refreshBrick(ViewData brick) {
         updateBrickPosition(brick);
         for (int i = 0; i < brick.getBrickData().length; i++) {
             for (int j = 0; j < brick.getBrickData()[i].length; j++) {
@@ -69,6 +97,10 @@ public class GameBoardRenderer { //Class to render the game board and active bri
         }
     }
 
+    /**
+     * Refresh background cells colors and rounded corners.
+     * @param board latest board matrix
+     */
     public void refreshBackground(int[][] board) {
         for (int i = UIConstants.BOARD_OFFSET_ROW; i < board.length; i++) {
             for (int j = 0; j < board[i].length; j++) {
@@ -79,7 +111,10 @@ public class GameBoardRenderer { //Class to render the game board and active bri
         }
     }
 
-    private void drawGridLines(int cols, int visibleRows) { //Draw the grid lines on the game board
+    /**
+     * Draw grid lines and border around the board.
+     */
+    private void drawGridLines(int cols, int visibleRows) {
         if (gridLines == null) return;
         gridLines.getChildren().clear();
 

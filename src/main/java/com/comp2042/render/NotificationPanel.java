@@ -15,6 +15,9 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 
+/**
+ * Popup panel that shows a bonus score with glow and fade/translate animation.
+ */
 public class NotificationPanel extends BorderPane {
 
     //Constants
@@ -28,6 +31,10 @@ public class NotificationPanel extends BorderPane {
     private static final double FADE_FROM_VALUE = 1.0;
     private static final double FADE_TO_VALUE = 0.0;
 
+    /**
+     * Create a notification panel displaying the given text.
+     * @param text message to show (e.g., "+100")
+     */
     public NotificationPanel(String text) {
         setMinHeight(NOTIFICATION_MIN_HEIGHT);
         setMinWidth(NOTIFICATION_MIN_WIDTH);
@@ -45,6 +52,10 @@ public class NotificationPanel extends BorderPane {
 
     }
 
+    /**
+     * Play fade and translate animation, then remove from the provided list.
+     * @param list parent children list to remove from when finished
+     */
     public void showScore(ObservableList<Node> list) {
         FadeTransition ft = new FadeTransition(Duration.millis(FADE_DURATION_MS), this);
         TranslateTransition tt = new TranslateTransition(Duration.millis(TRANSLATE_DURATION_MS), this);

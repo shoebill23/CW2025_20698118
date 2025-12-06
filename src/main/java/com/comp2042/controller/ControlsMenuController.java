@@ -7,6 +7,9 @@ import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
+/**
+ * Controller for the Controls overlay: shows key bindings and allows returning to pause menu.
+ */
 public class ControlsMenuController {
 
     //Font Sizes
@@ -40,11 +43,18 @@ public class ControlsMenuController {
     @FXML
     private Button backButton;
 
+    /**
+     * Inject the main GUI controller.
+     * @param guiController main controller
+     */
     public void setGuiController(GuiController guiController) {
         this.guiController = guiController;
     }
     
     @FXML
+    /**
+     * Initialize fonts for labels and buttons.
+     */
     private void initialize() {
 
         FontLoader.loadFont();
@@ -55,7 +65,10 @@ public class ControlsMenuController {
     }
 
     @FXML
-    private void onBackClicked() { //Takes player to Pause Menu when Back button is clicked
+    /**
+     * Go back to the Pause menu.
+     */
+    private void onBackClicked() {
         if (guiController != null) {
             guiController.showPauseMenu();
         }

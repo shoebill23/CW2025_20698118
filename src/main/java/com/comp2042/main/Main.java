@@ -14,6 +14,10 @@ import javafx.scene.media.MediaPlayer;
 import java.net.URL;
 import java.util.logging.Logger;
 
+/**
+ * JavaFX application entry point: loads Start menu, manages background music,
+ * and exposes helpers to adjust volume when paused.
+ */
 public class Main extends Application {
 
     //Constants
@@ -29,16 +33,21 @@ public class Main extends Application {
     private static final Logger logger = Logger.getLogger(Main.class.getName());
     private static MediaPlayer bgPlayer;
 
+    /**
+     * Preload the custom font before any FXML is loaded.
+     */
     @Override
     public void init() throws Exception {
-        // Load the font early, before any FXML is loaded
-        // This makes it available throughout the application
         String fontFamily = FontLoader.loadFont();
         if (fontFamily != null) {
             logger.info("Font ready for use. Family name: '" + fontFamily + "'");
         }
     }
 
+    /**
+     * Load and show the Start menu scene.
+     * @param primaryStage application stage
+     */
     @Override
     public void start(Stage primaryStage) throws Exception {
 
@@ -60,6 +69,10 @@ public class Main extends Application {
         playStartMusic();
     }
 
+    /**
+     * Internal helper to play looping background music.
+     * @param resource classpath media resource name
+     */
     private static void playMusic(String resource) {
         try {
             if (bgPlayer != null) {
@@ -82,24 +95,32 @@ public class Main extends Application {
         }
     }
 
+    /** Play Start menu music. */
     public static void playStartMusic() {
         playMusic(START_MENU_MUSIC);
     }
 
+    /** Play Classic mode music. */
     public static void playClassicMusic() {
         playMusic(CLASSIC_MUSIC);
     }
 
+    /** Play Time Attack mode music. */
     public static void playTimeAttackMusic() {
         playMusic(TIME_ATTACK_MUSIC);
     }
 
+    /**
+     * Reduce music volume when paused; restore otherwise.
+     * @param paused whether game is paused
+     */
     public static void setPaused(boolean paused) {
         if (bgPlayer != null) {
             bgPlayer.setVolume(paused ? BASE_VOLUME * 0.5 : BASE_VOLUME);
         }
     }
 
+    /** Stop and dispose the media player on application shutdown. */
     @Override
     public void stop() throws Exception {
         super.stop();

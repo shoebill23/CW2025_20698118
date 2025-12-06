@@ -4,6 +4,9 @@ import com.comp2042.general_utility.UIConstants;
 import javafx.scene.layout.GridPane;
 import javafx.scene.shape.Rectangle;
 
+/**
+ * Renders a small grid preview (Next/Hold) using a fixed-size matrix.
+ */
 public class PreviewRenderer {
     private final GridPane targetPane;
     private final int rows;
@@ -11,6 +14,13 @@ public class PreviewRenderer {
     private final int brickSize;
     private Rectangle[][] gridMatrix;
 
+    /**
+     * Create a preview renderer with specified grid dimensions and cell size.
+     * @param targetPane grid pane to render into
+     * @param rows number of rows
+     * @param cols number of columns
+     * @param brickSize cell size in pixels
+     */
     public PreviewRenderer(GridPane targetPane, int rows, int cols, int brickSize) {
         this.targetPane = targetPane;
         this.rows = rows;
@@ -34,6 +44,11 @@ public class PreviewRenderer {
         }
     }
 
+    /**
+     * Render the given matrix into the preview grid.
+     * Clears grid when data is null.
+     * @param data preview matrix (may be null)
+     */
     public void render(int[][] data) {
         for (int i = 0; i < rows; i++) {
             for (int j = 0; j < cols; j++) {

@@ -16,6 +16,9 @@ import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Controller for the Start menu: launches Classic or Time Attack modes.
+ */
 public class StartController {
 
     // Constants
@@ -37,11 +40,18 @@ public class StartController {
 
     private Stage primaryStage;
 
+    /**
+     * Initialize controller with the primary stage.
+     * @param stage primary stage
+     */
     public void init(Stage stage) {
         this.primaryStage = stage;
     }
 
     @FXML
+    /**
+     * Initialize fonts for the play buttons.
+     */
     private void initialize() {
         FontLoader.loadFont();
 
@@ -51,6 +61,11 @@ public class StartController {
 
     @FXML
 
+    /**
+     * Start the game scene with selected mode.
+     * @param timeAttack true for Time Attack mode, false for Classic
+     * @throws IOException when FXML cannot be loaded
+     */
     private void startGame(boolean timeAttack) throws IOException {
         try {
             if (primaryStage == null) {
@@ -94,11 +109,17 @@ public class StartController {
     }
 
     @FXML
+    /**
+     * Start Classic mode.
+     */
     private void onClassicClicked() throws IOException {
         startGame(false);
     }
 
     @FXML
+    /**
+     * Start Time Attack mode.
+     */
     private void onTimeAttackClicked() throws IOException {
         startGame(true);
     }

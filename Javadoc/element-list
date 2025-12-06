@@ -1,3 +1,4 @@
+module:com.comp2042
 com.comp2042.controller
 com.comp2042.general_utility
 com.comp2042.input

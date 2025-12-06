@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.List;
 
-public class RandomBrickGenerator implements BrickGenerator { //Generates the Bricks in random implementing a 7-Bag system
+public class RandomBrickGenerator implements BrickGenerator { //Generates the Bricks in random implementing a 7-Bag system. Source: https://harddrop.com/wiki/Random_Generator
 
     private final Deque<Brick> bag = new ArrayDeque<>();
 

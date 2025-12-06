@@ -3,7 +3,15 @@ package com.comp2042.render;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 
-public class ColorMapper { // Maps the index of a brick to its color
+/**
+ * Maps brick index values to JavaFX colors.
+ */
+public class ColorMapper {
+    /**
+     * Convert a brick index to a color.
+     * @param index brick value (0 = empty)
+     * @return paint color for the cell
+     */
     public static Paint getColor(int index) {
         return switch (index) {
             case 0 -> Color.TRANSPARENT;

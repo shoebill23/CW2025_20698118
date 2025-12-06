@@ -11,6 +11,9 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
+/**
+ * Controller for the Game Over overlay: retry and quit actions.
+ */
 public class GameOverMenuController {
 
     //Constants
@@ -28,11 +31,18 @@ public class GameOverMenuController {
     @FXML
     private Button quitButton;
 
+    /**
+     * Inject the main GUI controller.
+     * @param guiController main controller
+     */
     public void setGuiController(GuiController guiController) {
         this.guiController = guiController;
     }
     
     @FXML
+    /**
+     * Initialize fonts for labels and buttons.
+     */
     private void initialize() {
         FontLoader.loadFont();
 
@@ -41,6 +51,9 @@ public class GameOverMenuController {
     }
 
     @FXML
+    /**
+     * Retry the game by starting a new game.
+     */
     void onRetry() {
         if (guiController != null) {
             guiController.newGame();
@@ -48,6 +61,11 @@ public class GameOverMenuController {
     }
 
     @FXML
+    /**
+     * Quit to the start menu.
+     * @param event action event
+     * @throws IOException when navigation fails
+     */
     void onQuit(ActionEvent event) throws IOException {
         Stage stage = (Stage) ((Button) event.getSource()).getScene().getWindow();
         NavigationHelper.navigateToStartMenu(stage);
